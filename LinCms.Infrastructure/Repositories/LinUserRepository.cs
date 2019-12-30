@@ -38,6 +38,8 @@ namespace LinCms.Infrastructure.Repositories
             var linAuth = _linContext.LinAuths.FirstOrDefault(auth =>
                 auth.GroupId == currentUser.GroupId && auth.Auth == permissionName);
 
+            var s = _linContext.LinGroups.Include(g => g.LinAuths).ToList();
+
             return linAuth != null;
         }
     }

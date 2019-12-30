@@ -9,6 +9,7 @@ using FluentValidation.AspNetCore;
 using LinCms.Api.Controllers.V1;
 using LinCms.Api.Extensions;
 using LinCms.Api.Helpers;
+using LinCms.Api.Services;
 using LinCms.Core.Interfaces;
 using LinCms.Infrastructure.Database;
 using LinCms.Infrastructure.Extensions;
@@ -17,6 +18,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -91,6 +93,8 @@ namespace LinCms.Api
 
                 options.UseMySql(Configuration.GetConnectionString("MySqlConnection"),
                     b => b.MigrationsAssembly("LinCms.Api"));
+                //去掉所有的外键
+                options.ReplaceService<IMigrationsSqlGenerator, ExtendedMySqlGenerator>();
                 //options.ConfigureWarnings(
                 //    w => w.Ignore(CoreEventId.IncludeIgnoredWarning));
             });

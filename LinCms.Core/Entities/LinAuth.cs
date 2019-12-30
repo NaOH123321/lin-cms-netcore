@@ -11,5 +11,7 @@ namespace LinCms.Core.Entities
         public int GroupId { get; set; }
         public string? Auth { get; set; }
         public string? Module { get; set; }
+
+        public LinGroup LinGroup { get; set; } = null!;
     }
 }

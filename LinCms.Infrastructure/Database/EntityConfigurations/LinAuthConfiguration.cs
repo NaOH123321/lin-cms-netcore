@@ -24,6 +24,12 @@ namespace LinCms.Infrastructure.Database.EntityConfigurations
             builder.Property(e => e.Module)
                 .HasComment("权限的模块")
                 .HasMaxLength(50);
+
+            builder.HasOne(b => b.LinGroup)
+                .WithMany(o => o.LinAuths)
+                .HasPrincipalKey(o => o.Id)
+                .HasForeignKey(b => b.GroupId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
         }
     }
 }
