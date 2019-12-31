@@ -5,18 +5,17 @@ using System.Threading.Tasks;
 using AutoMapper;
 using LinCms.Core.Entities;
 using LinCms.Infrastructure.Resources;
-using LinCms.Infrastructure.Resources.Books;
+using LinCms.Infrastructure.Resources.LinUsers;
 
 namespace LinCms.Api.AutoMapper.Profiles
 {
-    public class BookProfile : Profile
+    public class LinUserProfile : Profile
     {
-        public BookProfile()
+        public LinUserProfile()
         {
-            CreateMap<Book, BookResource>();
+            CreateMap<LinUser, LinUserResource>();
 
-            CreateMap<BookAddResource, Book>();
-            CreateMap<BookUpdateResource, Book>();
+            CreateMap<LinUserAddResource, Book>();
         }
     }
 }

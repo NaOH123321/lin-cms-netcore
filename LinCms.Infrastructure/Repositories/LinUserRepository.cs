@@ -20,27 +20,51 @@ namespace LinCms.Infrastructure.Repositories
             _linContext = linContext;
         }
 
-        public async Task<LinUser> Verify(string username)
+        public async Task<LinUser> GetDetailAsync(int id)
         {
             var query = _linContext.LinUsers
                 .AsQueryable();
 
-            query = query.Where(u => u.Username == username);
+            query = query.Where(b => b.Id == id);
+
+            var linUser = await query.SingleOrDefaultAsync();
+            return linUser;
+        }
+
+        public async Task<LinUser> Verify(string username, string password)
+        {
+            var query = _linContext.LinUsers
+                .AsQueryable();
+
+            var encryptPassword = Pbkdf2Encrypt.EncryptPassword(password);
+            query = query.Where(u => u.Username == username && u.Password== encryptPassword);
 
             var user = await query.SingleOrDefaultAsync();
             return user;
         }
 
-        public bool CheckPermission(int uid, string permissionName)
+        public async Task<bool> CheckPermission(int uid, string permissionName)
         {
             var currentUser = _linContext.LinUsers.Find(uid);
 
-            var linAuth = _linContext.LinAuths.FirstOrDefault(auth =>
+            var linAuth = await _linContext.LinAuths.FirstOrDefaultAsync(auth =>
                 auth.GroupId == currentUser.GroupId && auth.Auth == permissionName);
 
-            var s = _linContext.LinGroups.Include(g => g.LinAuths).ToList();
-
             return linAuth != null;
+        }
+
+        public void Add(LinUser user)
+        {
+            _linContext.Add(user);
+        }
+        public void Update(LinUser user)
+        {
+            _linContext.Update(user);
+        }
+
+        public void Delete(LinUser user)
+        {
+            _linContext.Remove(user);
         }
     }
 }

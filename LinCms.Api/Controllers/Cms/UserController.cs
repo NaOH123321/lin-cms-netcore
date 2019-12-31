@@ -6,14 +6,16 @@ using System.Threading.Tasks;
 using LinCms.Api.Exceptions;
 using LinCms.Api.Helpers;
 using LinCms.Core;
+using LinCms.Core.Entities;
 using LinCms.Core.Interfaces;
 using LinCms.Core.RepositoryInterfaces;
-using LinCms.Infrastructure.Helpers;
-using LinCms.Infrastructure.Resources;
+using LinCms.Infrastructure.Resources.LinUsers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LinCms.Api.Controllers.Cms
 {
+    [Authorize]
     [Route("cms/user")]
     public class UserController : BasicController
     {
@@ -26,22 +28,33 @@ namespace LinCms.Api.Controllers.Cms
             _tokenService = tokenService;
         }
 
+        [HttpPost("register")]
+        [Log("管理员新建了一个用户")]
+        [PermissionMeta("注册", "用户",false)]
+        public async Task<IActionResult> Register(LinUserAddResource linUserAddResource)
+        {
+            var user = MyMapper.Map<LinUserAddResource, LinUser>(linUserAddResource);
+
+            _linUserRepository.Add(user);
+
+            if (!await UnitOfWork.SaveAsync())
+            {
+                throw new Exception("Save Failed!");
+            }
+
+            var resource = MyMapper.Map<LinUserResource>(user);
+            return Ok(resource);
+            //return CreatedAtRoute("GetBook", new { id = resource.Id }, resource);
+        }
+
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login(LinUserLoginResource linUserLoginResource)
         {
-            var user = await _linUserRepository.Verify(linUserLoginResource.Username);
+            var user = await _linUserRepository.Verify(linUserLoginResource.Username, linUserLoginResource.Password);
             if (user == null)
             {
-                throw new NotFoundException
-                {
-                    ErrorCode = ResultCode.UserNotFoundErrorCode
-                };
-            }
-
-            var encryptPassword = Pbkdf2Encrypt.EncryptPassword(linUserLoginResource.Password);
-            if (encryptPassword != user.Password)
-            {
-                throw new NotFoundException
+                throw new BadRequestException
                 {
                     ErrorCode = ResultCode.UserPasswordErrorCode
                 };
@@ -60,7 +73,10 @@ namespace LinCms.Api.Controllers.Cms
                 token = _tokenService.GenerateAccessToken(new[]
                 {
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new Claim(ClaimTypes.Name, user.Username)
+                    new Claim(ClaimTypes.Name, user.Username),
+
+                    new Claim("asd", new {usr=user.Admin }.ToString()),
+                    new Claim(ClaimTypes.Role, ((UserAdmin)user.Admin).ToString())
                 }),
                 refreshToken = _tokenService.GenerateRefreshToken(),
             };
@@ -68,30 +84,22 @@ namespace LinCms.Api.Controllers.Cms
             return Ok(result);
         }
 
-
+        #region application/x-www-form-urlencoded登录测试方法
+        [AllowAnonymous]
         [HttpPost("login")]
         [RequestHeaderMatchingMediaType("content-type", new[] { "application/x-www-form-urlencoded" })]
         public async Task<IActionResult> LoginByForm([FromForm] LinUserLoginResource linUserLoginResource)
         {
-            var user = await _linUserRepository.Verify(linUserLoginResource.Username);
+            var user = await _linUserRepository.Verify(linUserLoginResource.Username, linUserLoginResource.Password);
             if (user == null)
             {
-                throw new NotFoundException
-                {
-                    ErrorCode = ResultCode.UserNotFoundErrorCode
-                };
-            }
-
-            var encryptPassword = Pbkdf2Encrypt.EncryptPassword(linUserLoginResource.Password);
-            if (encryptPassword != user.Password)
-            {
-                throw new NotFoundException
+                throw new BadRequestException
                 {
                     ErrorCode = ResultCode.UserPasswordErrorCode
                 };
             }
 
-            if (user.Active != (short) UserActive.Active)
+            if (user.Active != (short)UserActive.Active)
             {
                 throw new UnauthorizedException()
                 {
@@ -104,12 +112,14 @@ namespace LinCms.Api.Controllers.Cms
                 token = _tokenService.GenerateAccessToken(new[]
                 {
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new Claim(ClaimTypes.Name, user.Username)
+                    new Claim(ClaimTypes.Name, user.Username),
+                    new Claim(ClaimTypes.Role, ((UserAdmin)user.Admin).ToString())
                 }),
                 refreshToken = _tokenService.GenerateRefreshToken(),
             };
 
             return Ok(result);
         }
+        #endregion
     }
 }

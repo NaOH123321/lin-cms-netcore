@@ -23,7 +23,7 @@ namespace LinCms.Api.Helpers
 
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, NameAuthorizationRequirement requirement)
         {
-            var userId = context.User.FindFirst(_ => _.Type == ClaimTypes.NameIdentifier).Value;
+            var userId = context.User.FindFirst(_ => _.Type == ClaimTypes.NameIdentifier)?.Value;
             if (!int.TryParse(userId, out var uid))
             {
                 context.Fail();
@@ -33,9 +33,10 @@ namespace LinCms.Api.Helpers
             if (context.User.IsInRole(UserAdmin.Admin.ToString()))
             {
                 context.Succeed(requirement);
+                return Task.CompletedTask;
             }
 
-            if (_linUserRepository.CheckPermission(uid, requirement.RequiredName))
+            if (_linUserRepository.CheckPermission(uid, requirement.RequiredName).Result)
             {
                 context.Succeed(requirement);
             }

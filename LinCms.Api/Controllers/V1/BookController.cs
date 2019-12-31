@@ -8,11 +8,12 @@ using LinCms.Core.Entities;
 using LinCms.Core.EntityQueryParameters;
 using LinCms.Core.RepositoryInterfaces;
 using LinCms.Infrastructure.Resources;
+using LinCms.Infrastructure.Resources.Books;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LinCms.Api.Controllers.V1
 {
-    //[Authorize]
     [Route("v1/book")]
     public class BookController : BasicController
     {
@@ -23,7 +24,7 @@ namespace LinCms.Api.Controllers.V1
             _bookRepository = bookRepository;
         }
 
-        [PermissionMeta("查看")]
+        [Authorize]
         [HttpGet(Name = "GetBooks")]
         public async Task<ActionResult<IEnumerable<BookResource>>> GetAll([FromQuery] BookParameters parameters)
         {
@@ -33,6 +34,7 @@ namespace LinCms.Api.Controllers.V1
             return Ok(resources);
         }
 
+        [Authorize]
         [HttpGet("{id}", Name = "GetBook")]
         public async Task<ActionResult<BookResource>> Get(int id)
         {
@@ -84,7 +86,8 @@ namespace LinCms.Api.Controllers.V1
             return Ok(resource);
         }
 
-        //需要管理员权限
+        [PermissionMeta("删除图书", "图书")]
+        //[PermissionMeta(role:"common")]
         [HttpDelete("{id}",Name = "DeleteBook")]
         public async Task<ActionResult> Delete(int id)
         {

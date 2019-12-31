@@ -56,15 +56,7 @@ namespace LinCms.Api
         {
             services.Replace(ServiceDescriptor.Transient<IControllerActivator, ServiceBasedControllerActivator>());
 
-            services.AddControllers(options =>
-                {
-                    options.ReturnHttpNotAcceptable = true;
-                    options.Filters.Add(new HttpResponseExceptionFilter());
-                    //改变model的验证信息
-                    options.ModelBindingMessageProvider.SetMissingRequestBodyRequiredValueAccessor(() => "请求的body不能为空");
-                    options.ModelBindingMessageProvider.SetNonPropertyAttemptedValueIsInvalidAccessor(value =>
-                        $"{value}不是有效的值");
-                })
+            services.AddControllers()
                 .AddNewtonsoftJson(options =>
                 {
                     options.SerializerSettings.ContractResolver = new DefaultContractResolver
@@ -79,6 +71,8 @@ namespace LinCms.Api
                     cf.RunDefaultMvcValidationAfterFluentValidationExecutes = false;
                 });
 
+            //设置MvcOptions的相关配置
+            services.AddSingleton<IConfigureOptions<MvcOptions>, ConfigureMvcOptions>();
             //设置模型校验方式
             services.AddSingleton<IConfigureOptions<ApiBehaviorOptions>, ConfigureApiBehaviorOptions>();
 

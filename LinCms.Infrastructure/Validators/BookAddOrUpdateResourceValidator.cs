@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using FluentValidation;
 using LinCms.Infrastructure.Database;
+using LinCms.Infrastructure.Messages;
 using LinCms.Infrastructure.Resources;
+using LinCms.Infrastructure.Resources.Books;
 
 namespace LinCms.Infrastructure.Validators
 {
@@ -17,33 +19,33 @@ namespace LinCms.Infrastructure.Validators
             RuleFor(x => x.Title)
                 .NotEmpty()
                 .WithName("图书名")
-                .WithMessage("required|{PropertyName}是必填的")
+                .WithMessage(FluentValidatorMessage.EmptyMessage)
                 .MaximumLength(50)
-                .WithMessage("maxlength|{PropertyName}的最大长度是{MaxLength}")
+                .WithMessage(FluentValidatorMessage.MaxLengthMessage)
                 .Must(x => !linContext.Books.Any(b => b.Title == x))
-                .WithMessage("existed|{PropertyName}已存在");
+                .WithMessage(FluentValidatorMessage.ExistedMessage);
             
 
             RuleFor(x => x.Author)
                 .NotEmpty()
                 .WithName("图书作者")
-                .WithMessage("required|{PropertyName}是必填的")
+                .WithMessage(FluentValidatorMessage.EmptyMessage)
                 .MaximumLength(30)
-                .WithMessage("maxlength|{PropertyName}的最大长度是{MaxLength}");
+                .WithMessage(FluentValidatorMessage.MaxLengthMessage);
 
             RuleFor(x => x.Summary)
                 .NotEmpty()
                 .WithName("图书综述")
-                .WithMessage("required|{PropertyName}是必填的")
+                .WithMessage(FluentValidatorMessage.EmptyMessage)
                 .MaximumLength(1000)
-                .WithMessage("maxlength|{PropertyName}的最大长度是{MaxLength}");
+                .WithMessage(FluentValidatorMessage.MaxLengthMessage);
 
             RuleFor(x => x.Image)
                 .NotEmpty()
                 .WithName("图书插图")
-                .WithMessage("required|{PropertyName}是必填的")
+                .WithMessage(FluentValidatorMessage.EmptyMessage)
                 .MaximumLength(50)
-                .WithMessage("maxlength|{PropertyName}的最大长度是{MaxLength}");
+                .WithMessage(FluentValidatorMessage.MaxLengthMessage);
         }
     }
 }

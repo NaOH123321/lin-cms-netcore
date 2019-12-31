@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mime;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using LinCms.Infrastructure.Messages;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -38,21 +39,40 @@ namespace LinCms.Api.Helpers
                     //    context.Token = context.Request.Query["access_token"];
                     //    return Task.CompletedTask;
                     //},
-                    OnAuthenticationFailed = context =>
+                    OnTokenValidated = context =>
                     {
+                        var ssd = context.Principal.Claims;
+                        return Task.CompletedTask;
+                    },
+
+                    //OnAuthenticationFailed = context =>
+                    //{
+                    //    context.Response.ContentType = MediaTypeNames.Application.Json;
+                    //    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+
+                    //    if (context.Exception is SecurityTokenInvalidSignatureException ||
+                    //        context.Exception is ArgumentException)
+                    //    {
+                    //        context.Response.WriteAsync(new UnauthorizedNotValidTokenMsg().ToJson());
+                    //    }
+
+                    //    if (context.Exception is SecurityTokenExpiredException)
+                    //    {
+                    //        context.Response.WriteAsync(new UnauthorizedTokenTimeoutMsg().ToJson());
+                    //    }
+                    //    return Task.CompletedTask;
+                    //},
+
+                    OnChallenge = context =>
+                    {
+                        context.HandleResponse();
+
+                        var sd = context.AuthenticateFailure;
+
                         context.Response.ContentType = MediaTypeNames.Application.Json;
                         context.Response.StatusCode = StatusCodes.Status401Unauthorized;
 
-                        if (context.Exception is SecurityTokenInvalidSignatureException ||
-                            context.Exception is ArgumentException)
-                        {
-                            context.Response.WriteAsync(new UnauthorizedNotValidTokenMsg().ToJson());
-                        }
-
-                        if (context.Exception is SecurityTokenExpiredException)
-                        {
-                            context.Response.WriteAsync(new UnauthorizedTokenTimeoutMsg().ToJson());
-                        }
+                        //context.Response.WriteAsync("");
 
                         return Task.CompletedTask;
                     }

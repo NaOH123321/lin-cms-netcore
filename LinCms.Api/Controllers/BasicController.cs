@@ -22,7 +22,7 @@ namespace LinCms.Api.Controllers
         /// 获取有效token用户的Id
         /// </summary>
         /// <returns></returns>
-        protected string GetLoginUserId()
+        protected string? GetLoginUserId()
         {
             return User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
         }

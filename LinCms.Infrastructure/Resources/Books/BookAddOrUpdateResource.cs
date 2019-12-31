@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
-
-namespace LinCms.Infrastructure.Resources
+﻿namespace LinCms.Infrastructure.Resources.Books
 {
     public class BookAddOrUpdateResource
     {

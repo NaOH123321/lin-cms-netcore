@@ -15,6 +15,7 @@ namespace LinCms.Api.Extensions
         public static void AddRepositories(this IServiceCollection services)
         {
             services.AddScoped<ILinUserRepository, LinUserRepository>();
+            services.AddScoped<ILinLogRepository, LinLogRepository>();
             services.AddScoped<IBookRepository, BookRepository>();
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
