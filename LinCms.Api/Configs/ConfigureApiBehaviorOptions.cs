@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mime;
+﻿using System.Net.Mime;
 using LinCms.Infrastructure.Messages;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
-namespace LinCms.Api.Helpers
+namespace LinCms.Api.Configs
 {
     public class ConfigureApiBehaviorOptions : IConfigureNamedOptions<ApiBehaviorOptions>
     {
@@ -22,7 +19,7 @@ namespace LinCms.Api.Helpers
             {
                 var badRequestMsg = new BadRequestMsg
                 {
-                    Msg = new BadRequestObjectResult(context.ModelState).Value
+                    Msg = new ValidationProblemDetails(context.ModelState).Errors
                 };
 
                 var result = new ObjectResult(badRequestMsg)

@@ -8,9 +8,9 @@ namespace LinCms.Core.RepositoryInterfaces
 {
     public interface ILinUserRepository
     {
-        Task<LinUser> GetDetailAsync(int id);
+        Task<LinUser?> GetDetailAsync(int id);
 
-        Task<LinUser> Verify(string username, string password);
+        Task<LinUser?> Verify(string username, string password);
 
         Task<bool> CheckPermission(int uid, string permissionName);
 

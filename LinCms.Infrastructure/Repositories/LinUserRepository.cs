@@ -20,7 +20,7 @@ namespace LinCms.Infrastructure.Repositories
             _linContext = linContext;
         }
 
-        public async Task<LinUser> GetDetailAsync(int id)
+        public async Task<LinUser?> GetDetailAsync(int id)
         {
             var query = _linContext.LinUsers
                 .AsQueryable();
@@ -31,7 +31,7 @@ namespace LinCms.Infrastructure.Repositories
             return linUser;
         }
 
-        public async Task<LinUser> Verify(string username, string password)
+        public async Task<LinUser?> Verify(string username, string password)
         {
             var query = _linContext.LinUsers
                 .AsQueryable();

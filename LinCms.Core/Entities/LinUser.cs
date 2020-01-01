@@ -14,5 +14,7 @@ namespace LinCms.Core.Entities
         public string? Email { get; set; }
         public int? GroupId { get; set; }
         public string? Password { get; set; }
+
+        public LinGroup LinGroup { get; set; } = null!;
     }
 }

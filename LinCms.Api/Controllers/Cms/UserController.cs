@@ -30,8 +30,8 @@ namespace LinCms.Api.Controllers.Cms
 
         [HttpPost("register")]
         [Log("管理员新建了一个用户")]
-        [PermissionMeta("注册", "用户",false)]
-        public async Task<IActionResult> Register(LinUserAddResource linUserAddResource)
+        [PermissionMeta("注册", "用户", "Admin", false)]
+        public async Task<ActionResult<LinUserResource>> Register(LinUserAddResource linUserAddResource)
         {
             var user = MyMapper.Map<LinUserAddResource, LinUser>(linUserAddResource);
 
@@ -49,7 +49,7 @@ namespace LinCms.Api.Controllers.Cms
 
         [AllowAnonymous]
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LinUserLoginResource linUserLoginResource)
+        public async Task<ActionResult> Login(LinUserLoginResource linUserLoginResource)
         {
             var user = await _linUserRepository.Verify(linUserLoginResource.Username, linUserLoginResource.Password);
             if (user == null)

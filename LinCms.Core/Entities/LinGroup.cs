@@ -10,6 +10,8 @@ namespace LinCms.Core.Entities
         public LinGroup()
         {
             LinAuths = new List<LinAuth>();
+            LinUsers = new List<LinUser>();
+            LinEvents = new List<LinEvent>();
         }
 
         public int Id { get; set; }
@@ -17,5 +19,7 @@ namespace LinCms.Core.Entities
         public string? Info { get; set; }
 
         public IList<LinAuth> LinAuths { get; set; }
+        public IList<LinUser> LinUsers { get; set; }
+        public IList<LinEvent> LinEvents { get; set; }
     }
 }

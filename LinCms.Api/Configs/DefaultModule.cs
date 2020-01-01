@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Autofac;
+﻿using Autofac;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LinCms.Api.Helpers
+namespace LinCms.Api.Configs
 {
     public class DefaultModule: Module
     {

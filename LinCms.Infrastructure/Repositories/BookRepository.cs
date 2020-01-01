@@ -21,7 +21,7 @@ namespace LinCms.Infrastructure.Repositories
             _linContext = linContext;
         }
 
-        public async Task<Book> GetDetailAsync(int id)
+        public async Task<Book?> GetDetailAsync(int id)
         {
             var query = _linContext.Books
                 .AsQueryable();

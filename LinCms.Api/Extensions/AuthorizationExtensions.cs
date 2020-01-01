@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using LinCms.Api.Helpers;
+using LinCms.Api.Services;
 
 namespace LinCms.Api.Extensions
 {

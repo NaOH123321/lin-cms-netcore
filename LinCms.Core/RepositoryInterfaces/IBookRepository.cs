@@ -7,7 +7,7 @@ namespace LinCms.Core.RepositoryInterfaces
 {
     public interface IBookRepository
     {
-        Task<Book> GetDetailAsync(int id);
+        Task<Book?> GetDetailAsync(int id);
 
         Task<IEnumerable<Book>> GetAllAsync(BookParameters parameters);
 

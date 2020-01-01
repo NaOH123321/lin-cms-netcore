@@ -58,6 +58,15 @@ namespace LinCms.Infrastructure.Database.EntityConfigurations
             builder.HasIndex(p => p.Email)
                 .HasName("uk_email")
                 .IsUnique();
+
+            builder.HasIndex(p => p.GroupId)
+                .HasName("idx_group_id");
+
+            builder.HasOne(b => b.LinGroup)
+                .WithMany(o => o.LinUsers)
+                .HasPrincipalKey(o => o.Id)
+                .HasForeignKey(b => b.GroupId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
         }
     }
 }

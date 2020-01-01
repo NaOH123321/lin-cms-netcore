@@ -10,6 +10,8 @@ namespace LinCms.Api.Helpers
     [AttributeUsage(AttributeTargets.All, AllowMultiple = true)]
     public class RequestHeaderMatchingMediaTypeAttribute : Attribute, IActionConstraint
     {
+        public int Order { get; } = 0;
+
         private readonly string _requestHeaderToMatch;
         private readonly string[] _mediaTypes;
 
@@ -35,7 +37,5 @@ namespace LinCms.Api.Helpers
 
             return false;
         }
-
-        public int Order { get; } = 0;
     }
 }

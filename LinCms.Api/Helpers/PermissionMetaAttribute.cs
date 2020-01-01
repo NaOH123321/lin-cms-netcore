@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using LinCms.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
@@ -15,25 +16,31 @@ namespace LinCms.Api.Helpers
     {
         public string? Auth { get; }
         public string? Module { get; }
+        public string Role { get; }
         public bool Mount { get; } = false;
 
-        public PermissionMetaAttribute(string auth, string module, bool mount = true)
+        public PermissionMetaAttribute(string auth, string module, string role = UserRole.Group, bool mount = true)
         {
             Auth = auth;
             Module = module;
             Mount = mount;
+            Role = role;
         }
 
         public PermissionMetaAttribute(string role)
         {
-            Roles = role;
+            Role = role;
         }
 
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
             var authorizationService = context.HttpContext.RequestServices.GetRequiredService<IAuthorizationService>();
             var authorizationResult = await authorizationService.AuthorizeAsync(context.HttpContext.User, null,
-                new NameAuthorizationRequirement(Auth));
+                new PermissionMetaRequirement
+                {
+                    Name = Auth,
+                    Role = Role
+                });
             if (!authorizationResult.Succeeded)
             {
                 context.Result = new ForbidResult();

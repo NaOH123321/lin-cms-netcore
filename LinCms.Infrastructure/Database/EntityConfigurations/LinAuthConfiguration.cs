@@ -25,6 +25,9 @@ namespace LinCms.Infrastructure.Database.EntityConfigurations
                 .HasComment("权限的模块")
                 .HasMaxLength(50);
 
+            builder.HasIndex(p => p.GroupId)
+                .HasName("idx_group_id");
+
             builder.HasOne(b => b.LinGroup)
                 .WithMany(o => o.LinAuths)
                 .HasPrincipalKey(o => o.Id)

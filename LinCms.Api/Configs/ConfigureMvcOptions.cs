@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using LinCms.Api.Helpers;
 using LinCms.Core.Interfaces;
 using LinCms.Core.RepositoryInterfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
-namespace LinCms.Api.Helpers
+namespace LinCms.Api.Configs
 {
     public class ConfigureMvcOptions : IConfigureNamedOptions<MvcOptions>
     {
@@ -33,8 +30,7 @@ namespace LinCms.Api.Helpers
 
             //改变model的验证信息
             options.ModelBindingMessageProvider.SetMissingRequestBodyRequiredValueAccessor(() => "请求的body不能为空");
-            options.ModelBindingMessageProvider.SetNonPropertyAttemptedValueIsInvalidAccessor(value =>
-                $"{value}不是有效的值");
+            options.ModelBindingMessageProvider.SetNonPropertyAttemptedValueIsInvalidAccessor(value => $"{value}不是有效的值");
         }
     }
 }

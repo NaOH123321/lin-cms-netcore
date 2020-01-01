@@ -6,15 +6,15 @@ using System.Text.Json;
 using Autofac;
 using AutoMapper;
 using FluentValidation.AspNetCore;
-using LinCms.Api.Controllers.V1;
+using LinCms.Api.Configs;
 using LinCms.Api.Extensions;
 using LinCms.Api.Helpers;
 using LinCms.Api.Services;
 using LinCms.Core.Interfaces;
 using LinCms.Infrastructure.Database;
-using LinCms.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.EntityFrameworkCore;
@@ -76,7 +76,7 @@ namespace LinCms.Api
             //设置模型校验方式
             services.AddSingleton<IConfigureOptions<ApiBehaviorOptions>, ConfigureApiBehaviorOptions>();
 
-            //services.AddMediaTypes();
+
             services.AddMyAuthentication();
             services.AddMyAuthorization();
 
@@ -89,10 +89,9 @@ namespace LinCms.Api
                     b => b.MigrationsAssembly("LinCms.Api"));
                 //去掉所有的外键
                 options.ReplaceService<IMigrationsSqlGenerator, ExtendedMySqlGenerator>();
-                //options.ConfigureWarnings(
-                //    w => w.Ignore(CoreEventId.IncludeIgnoredWarning));
             });
 
+            services.AddScoped<ICurrentUser, CurrentUser>();
             ////设置跨域
             //services.AddCors();
             //注册资源映射关系 MappingProfile
@@ -121,13 +120,14 @@ namespace LinCms.Api
                 app.UseMyExceptionHandler();
                 app.UseHsts();
             }
-            app.UseAuthentication();
-
+            
             app.UseHttpsRedirection();
 
             app.UseRouting();
 
             app.UseStatusCodeHandling();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

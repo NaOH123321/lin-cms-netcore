@@ -1,18 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mime;
+using System.Security.Claims;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
+using LinCms.Api.Services;
+using LinCms.Core.Interfaces;
+using LinCms.Core.RepositoryInterfaces;
 using LinCms.Infrastructure.Messages;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace LinCms.Api.Helpers
+namespace LinCms.Api.Configs
 {
     public class ConfigureJwtBearerOptions : IConfigureNamedOptions<JwtBearerOptions>
     {
@@ -39,40 +42,30 @@ namespace LinCms.Api.Helpers
                     //    context.Token = context.Request.Query["access_token"];
                     //    return Task.CompletedTask;
                     //},
-                    OnTokenValidated = context =>
-                    {
-                        var ssd = context.Principal.Claims;
-                        return Task.CompletedTask;
-                    },
-
-                    //OnAuthenticationFailed = context =>
-                    //{
-                    //    context.Response.ContentType = MediaTypeNames.Application.Json;
-                    //    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-
-                    //    if (context.Exception is SecurityTokenInvalidSignatureException ||
-                    //        context.Exception is ArgumentException)
-                    //    {
-                    //        context.Response.WriteAsync(new UnauthorizedNotValidTokenMsg().ToJson());
-                    //    }
-
-                    //    if (context.Exception is SecurityTokenExpiredException)
-                    //    {
-                    //        context.Response.WriteAsync(new UnauthorizedTokenTimeoutMsg().ToJson());
-                    //    }
-                    //    return Task.CompletedTask;
-                    //},
 
                     OnChallenge = context =>
                     {
+                        var exception = context.AuthenticateFailure;
+
+                        if (exception == null)
+                        {
+                            return Task.CompletedTask;
+                        }
+
                         context.HandleResponse();
-
-                        var sd = context.AuthenticateFailure;
-
                         context.Response.ContentType = MediaTypeNames.Application.Json;
                         context.Response.StatusCode = StatusCodes.Status401Unauthorized;
 
-                        //context.Response.WriteAsync("");
+                        if (exception is SecurityTokenValidationException ||
+                            exception is ArgumentException)
+                        {
+                            context.Response.WriteAsync(new UnauthorizedNotValidTokenMsg().ToJson());
+                        }
+
+                        if (exception is SecurityTokenExpiredException)
+                        {
+                            context.Response.WriteAsync(new UnauthorizedTokenTimeoutMsg().ToJson());
+                        }
 
                         return Task.CompletedTask;
                     }

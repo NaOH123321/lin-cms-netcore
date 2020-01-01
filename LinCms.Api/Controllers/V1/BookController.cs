@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using LinCms.Api.Exceptions;
 using LinCms.Api.Helpers;
+using LinCms.Core;
 using LinCms.Core.Entities;
 using LinCms.Core.EntityQueryParameters;
 using LinCms.Core.RepositoryInterfaces;
@@ -86,8 +87,8 @@ namespace LinCms.Api.Controllers.V1
             return Ok(resource);
         }
 
+        [PermissionMeta(role: "Admin")]
         [PermissionMeta("删除图书", "图书")]
-        //[PermissionMeta(role:"common")]
         [HttpDelete("{id}",Name = "DeleteBook")]
         public async Task<ActionResult> Delete(int id)
         {

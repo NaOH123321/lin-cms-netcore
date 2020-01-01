@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
-using Microsoft.EntityFrameworkCore.Scaffolding;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure.Internal;
 using Pomelo.EntityFrameworkCore.MySql.Migrations;
-using Pomelo.EntityFrameworkCore.MySql.Scaffolding.Internal;
 
-namespace LinCms.Api.Services
+namespace LinCms.Api.Configs
 {
     public class ExtendedMySqlGenerator : MySqlMigrationsSqlGenerator
     {

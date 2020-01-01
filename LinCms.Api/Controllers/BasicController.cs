@@ -18,13 +18,6 @@ namespace LinCms.Api.Controllers
         public IMapper MyMapper { set; get; } = null!;
         public IUnitOfWork UnitOfWork { set; get; } = null!;
 
-        /// <summary>
-        /// 获取有效token用户的Id
-        /// </summary>
-        /// <returns></returns>
-        protected string? GetLoginUserId()
-        {
-            return User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
-        }
+        public ICurrentUser CurrentUser { set; get; } = null!;
     }
 }

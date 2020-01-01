@@ -17,10 +17,10 @@ namespace LinCms.Api.Helpers
 {
     public class LogActionFilter : IActionFilter, IOrderedFilter
     {
+        public int Order { get; set; } = int.MaxValue - 10;
+
         private readonly ILinLogRepository _linLogRepository;
         private readonly IUnitOfWork _unitOfWork;
-
-        public int Order { get; set; } = int.MaxValue - 10;
 
         public LogActionFilter(ILinLogRepository linLogRepository, IUnitOfWork unitOfWork)
         {

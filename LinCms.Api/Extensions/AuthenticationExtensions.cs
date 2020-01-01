@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LinCms.Api.Configs;
 using LinCms.Api.Helpers;
 using LinCms.Api.Services;
 using LinCms.Core.Interfaces;
@@ -16,7 +17,11 @@ namespace LinCms.Api.Extensions
     {
         public static void AddMyAuthentication(this IServiceCollection services)
         {
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
                 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, configureOptions: null);
             //验证JwtBearer的相关配置
             services.AddSingleton<IConfigureOptions<JwtBearerOptions>, ConfigureJwtBearerOptions>();

@@ -20,6 +20,15 @@ namespace LinCms.Infrastructure.Database.EntityConfigurations
             builder.Property(e => e.MessageEvents)
                 .HasComment("信息")
                 .HasMaxLength(250);
+
+            builder.HasIndex(p => p.GroupId)
+                .HasName("idx_group_id");
+
+            builder.HasOne(b => b.LinGroup)
+                .WithMany(o => o.LinEvents)
+                .HasPrincipalKey(o => o.Id)
+                .HasForeignKey(b => b.GroupId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
         }
     }
 }
