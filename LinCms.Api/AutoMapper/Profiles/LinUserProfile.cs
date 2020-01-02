@@ -15,7 +15,7 @@ namespace LinCms.Api.AutoMapper.Profiles
         {
             CreateMap<LinUser, LinUserResource>();
 
-            CreateMap<LinUserAddResource, Book>();
+            CreateMap<LinUserAddResource, LinUser>();
         }
     }
 }

@@ -19,18 +19,21 @@ namespace LinCms.Infrastructure.Validators
                 .NotEmpty()
                 .WithName("用户名")
                 .WithMessage(FluentValidatorMessage.EmptyMessage)
-                .MinimumLength(2)
-                .MaximumLength(10)
+                .Length(2, 10)
                 .WithMessage(FluentValidatorMessage.MinLengthAndMaxLengthMessage);
 
             RuleFor(x => x.Password)
                 .NotEmpty()
                 .WithName("密码")
-                .WithMessage(FluentValidatorMessage.EmptyMessage)
-                .MinimumLength(6)
-                .MaximumLength(22)
+                .WithMessage(FluentValidatorMessage.EmptyMessage);
+
+            RuleFor(x => x.Password)
+                .Cascade(CascadeMode.Continue)
+                .Length(6, 22)
+                .WithName("密码")
+                .WithMessage(FluentValidatorMessage.MinLengthAndMaxLengthMessage)
                 .Matches("^[A-Za-z0-9_*&$#@]")
-                .WithMessage(FluentValidatorMessage.MinLengthAndMaxLengthMessage + "，包含字符、数字和 _");
+                .WithMessage("required|{PropertyName}需要包含字符、数字和 _");
 
             RuleFor(x => x.GroupId)
                 .NotEmpty()

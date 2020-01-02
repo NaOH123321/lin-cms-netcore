@@ -26,7 +26,6 @@ namespace LinCms.Api.Controllers.V1
         }
 
         [Authorize]
-        [Log("{user.username}asdadas{user.id}as")]
         [HttpGet(Name = "GetBooks")]
         public async Task<ActionResult<IEnumerable<BookResource>>> GetAll([FromQuery] BookParameters parameters)
         {
@@ -37,7 +36,6 @@ namespace LinCms.Api.Controllers.V1
         }
 
         [Authorize]
-        [Log("{user.username}asdadasasss")]
         [HttpGet("{id}", Name = "GetBook")]
         public async Task<ActionResult<BookResource>> Get(int id)
         {

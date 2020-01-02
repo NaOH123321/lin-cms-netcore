@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using LinCms.Api.Exceptions;
@@ -73,22 +74,10 @@ namespace LinCms.Api.Controllers.Cms
                 };
             }
 
-            var result = new
-            {
-                token = _tokenService.GenerateAccessToken(new[]
-                {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new Claim(TokenOption.Type, TokenOption.AccessType)
-                }),
-                refreshToken = _tokenService.GenerateAccessToken(new[]
-                {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new Claim(TokenOption.Type, TokenOption.RefreshType)
-                }),
-            };
+            var result = GetTokenResult(user.Id.ToString());
 
             //记录日志
-            _linLogger.AddLog(user.Id, user.Username, "{user.username}登陆成功获取了令牌", "登陆");
+            _linLogger.AddLog(user.Id, user.Username, $"{user.Username}登陆成功获取了令牌", "登陆");
 
             return Ok(result);
         }
@@ -101,8 +90,9 @@ namespace LinCms.Api.Controllers.Cms
             string userId;
             try
             {
-                if (CurrentUser.Token == null) throw new UnauthorizedNotValidTokenException();
-                var principal = _tokenService.GetPrincipalFromValidToken(CurrentUser.Token);
+                var authorizationHeader = HttpContext.Request.Headers[HttpRequestHeader.Authorization.ToString()];
+                var token = authorizationHeader.ToString().Split(" ")[1];
+                var principal = _tokenService.GetPrincipalFromValidToken(token);
                 userId = principal.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
             }
             catch (Exception)
@@ -110,20 +100,7 @@ namespace LinCms.Api.Controllers.Cms
                 throw new UnauthorizedNotValidTokenException();
             }
 
-            var result = new
-            {
-                token = _tokenService.GenerateAccessToken(new[]
-                {
-                    new Claim(ClaimTypes.NameIdentifier, userId),
-                    new Claim(TokenOption.Type, TokenOption.AccessType)
-                }),
-                refreshToken = _tokenService.GenerateAccessToken(new[]
-                {
-                    new Claim(ClaimTypes.NameIdentifier, userId),
-                    new Claim(TokenOption.Type, TokenOption.RefreshType)
-                }),
-            };
-
+            var result = GetTokenResult(userId);
             return Ok(result);
         }
 
@@ -164,9 +141,27 @@ namespace LinCms.Api.Controllers.Cms
             return Ok(resource);
         }
 
+        private object GetTokenResult(string uid)
+        {
+            var result = new
+            {
+                token = _tokenService.GenerateAccessToken(new[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier, uid),
+                    new Claim(TokenOption.Type, TokenOption.AccessType)
+                }),
+                refreshToken = _tokenService.GenerateAccessToken(new[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier, uid),
+                    new Claim(TokenOption.Type, TokenOption.RefreshType)
+                }),
+            };
+
+            return result;
+        }
 
         #region application/x-www-form-urlencoded登录测试方法
-    [AllowAnonymous]
+        [AllowAnonymous]
         [HttpPost("login")]
         [RequestHeaderMatchingMediaType("content-type", new[] { "application/x-www-form-urlencoded" })]
         public async Task<IActionResult> LoginByForm([FromForm] LinUserLoginResource linUserLoginResource)
