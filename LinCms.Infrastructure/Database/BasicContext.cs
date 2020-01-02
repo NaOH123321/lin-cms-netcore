@@ -24,6 +24,12 @@ namespace LinCms.Infrastructure.Database
             EntityConfiguration(modelBuilder);
         }
 
+        public override int SaveChanges()
+        {
+            OnBeforeSaving();
+            return base.SaveChanges();
+        }
+
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {
             OnBeforeSaving();

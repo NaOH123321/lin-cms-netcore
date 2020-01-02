@@ -12,8 +12,6 @@ namespace LinCms.Core.RepositoryInterfaces
 
         Task<LinUser?> Verify(string username, string password);
 
-        Task<bool> CheckPermission(int uid, string permissionName);
-
         void Add(LinUser user);
 
         void Update(LinUser user);

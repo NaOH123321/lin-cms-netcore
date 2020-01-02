@@ -8,13 +8,11 @@ namespace LinCms.Api.Configs
 {
     public class ConfigureMvcOptions : IConfigureNamedOptions<MvcOptions>
     {
-        private readonly ILinLogRepository _linLogRepository;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly ILinLogger _linLogger;
 
-        public ConfigureMvcOptions(ILinLogRepository linLogRepository, IUnitOfWork unitOfWork)
+        public ConfigureMvcOptions(ILinLogger linLogger)
         {
-            _linLogRepository = linLogRepository;
-            _unitOfWork = unitOfWork;
+            _linLogger = linLogger;
         }
 
         public void Configure(MvcOptions options)
@@ -26,7 +24,7 @@ namespace LinCms.Api.Configs
         {
             options.ReturnHttpNotAcceptable = true;
             options.Filters.Add(new HttpResponseExceptionFilter());
-            options.Filters.Add(new LogActionFilter(_linLogRepository, _unitOfWork));
+            options.Filters.Add(new LogActionFilter(_linLogger));
 
             //改变model的验证信息
             options.ModelBindingMessageProvider.SetMissingRequestBodyRequiredValueAccessor(() => "请求的body不能为空");

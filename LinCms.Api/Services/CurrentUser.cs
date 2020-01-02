@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http.Headers;
 using System.Security.Claims;
 using LinCms.Core;
 using LinCms.Core.Interfaces;
@@ -13,6 +15,8 @@ namespace LinCms.Api.Services
 {
     public class CurrentUser : ICurrentUser
     {
+        public string? Token { get; }
+
         public int Id { get; }
         public string Username { get; } = null!;
         public string? Nickname { get; }
@@ -26,6 +30,18 @@ namespace LinCms.Api.Services
 
         public CurrentUser(IHttpContextAccessor httpContextAccessor, LinContext linContext)
         {
+            try
+            {
+                var headers = httpContextAccessor.HttpContext.Request.Headers;
+                var authorizationHeader = headers[HttpRequestHeader.Authorization.ToString()];
+                Token = authorizationHeader.ToString().Split(" ")[1];
+            }
+            catch (Exception)
+            {
+                Token = null;
+                return;
+            }
+
             var claims = httpContextAccessor.HttpContext.User.Claims;
             var uid = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
             if (!int.TryParse(uid, out var id)) return;

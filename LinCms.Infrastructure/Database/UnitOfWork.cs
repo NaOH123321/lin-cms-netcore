@@ -17,6 +17,11 @@ namespace LinCms.Infrastructure.Database
             _linContext = linContext;
         }
 
+        public bool Save()
+        {
+            return  _linContext.SaveChanges() > 0;
+        }
+
         public async Task<bool> SaveAsync()
         {
             return await _linContext.SaveChangesAsync() > 0;

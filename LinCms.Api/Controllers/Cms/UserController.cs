@@ -5,12 +5,14 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using LinCms.Api.Exceptions;
 using LinCms.Api.Helpers;
+using LinCms.Api.Services;
 using LinCms.Core;
 using LinCms.Core.Entities;
 using LinCms.Core.Interfaces;
 using LinCms.Core.RepositoryInterfaces;
 using LinCms.Infrastructure.Resources.LinUsers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LinCms.Api.Controllers.Cms
@@ -21,16 +23,18 @@ namespace LinCms.Api.Controllers.Cms
     {
         private readonly ILinUserRepository _linUserRepository;
         private readonly ITokenService _tokenService;
+        private readonly ILinLogger _linLogger;
 
-        public UserController(ILinUserRepository linUserRepository, ITokenService tokenService)
+        public UserController(ILinUserRepository linUserRepository, ITokenService tokenService, ILinLogger linLogger)
         {
             _linUserRepository = linUserRepository;
             _tokenService = tokenService;
+            _linLogger = linLogger;
         }
 
         [HttpPost("register")]
         [Log("管理员新建了一个用户")]
-        [PermissionMeta("注册", "用户", "Admin", false)]
+        [PermissionMeta("注册", "用户", UserRole.Admin, false)]
         public async Task<ActionResult<LinUserResource>> Register(LinUserAddResource linUserAddResource)
         {
             var user = MyMapper.Map<LinUserAddResource, LinUser>(linUserAddResource);
@@ -49,6 +53,7 @@ namespace LinCms.Api.Controllers.Cms
 
         [AllowAnonymous]
         [HttpPost("login")]
+        [PermissionMeta("登陆", "用户", UserRole.Every, false)]
         public async Task<ActionResult> Login(LinUserLoginResource linUserLoginResource)
         {
             var user = await _linUserRepository.Verify(linUserLoginResource.Username, linUserLoginResource.Password);
@@ -73,19 +78,95 @@ namespace LinCms.Api.Controllers.Cms
                 token = _tokenService.GenerateAccessToken(new[]
                 {
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new Claim(ClaimTypes.Name, user.Username),
-
-                    new Claim("asd", new {usr=user.Admin }.ToString()),
-                    new Claim(ClaimTypes.Role, ((UserAdmin)user.Admin).ToString())
+                    new Claim(TokenOption.Type, TokenOption.AccessType)
                 }),
-                refreshToken = _tokenService.GenerateRefreshToken(),
+                refreshToken = _tokenService.GenerateAccessToken(new[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(TokenOption.Type, TokenOption.RefreshType)
+                }),
+            };
+
+            //记录日志
+            _linLogger.AddLog(user.Id, user.Username, "{user.username}登陆成功获取了令牌", "登陆");
+
+            return Ok(result);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("refresh")]
+        [PermissionMeta("刷新令牌", "用户", UserRole.Every, false)]
+        public ActionResult Refresh()
+        {
+            string userId;
+            try
+            {
+                if (CurrentUser.Token == null) throw new UnauthorizedNotValidTokenException();
+                var principal = _tokenService.GetPrincipalFromValidToken(CurrentUser.Token);
+                userId = principal.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            }
+            catch (Exception)
+            {
+                throw new UnauthorizedNotValidTokenException();
+            }
+
+            var result = new
+            {
+                token = _tokenService.GenerateAccessToken(new[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier, userId),
+                    new Claim(TokenOption.Type, TokenOption.AccessType)
+                }),
+                refreshToken = _tokenService.GenerateAccessToken(new[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier, userId),
+                    new Claim(TokenOption.Type, TokenOption.RefreshType)
+                }),
             };
 
             return Ok(result);
         }
 
+        [HttpGet("information")]
+        [PermissionMeta("查询自己信息", "用户", UserRole.Every, false)]
+        public ActionResult Information()
+        {
+            var resource = MyMapper.Map<LinUserResource>(CurrentUser);
+
+            return Ok(resource);
+        }
+
+        [HttpPut]
+        [PermissionMeta("用户更新信息", "用户", UserRole.Every, false)]
+        public ActionResult UpdateInformation()
+        {
+            var resource = MyMapper.Map<LinUserResource>(CurrentUser);
+
+            return Ok(resource);
+        }
+
+        [HttpPut("change_password")]
+        [Log("{user.username}修改了自己的密码")]
+        [PermissionMeta("修改密码", "用户", UserRole.Every, false)]
+        public ActionResult ChangePassword()
+        {
+            var resource = MyMapper.Map<LinUserResource>(CurrentUser);
+
+            return Ok(resource);
+        }
+
+        [HttpGet("auths")]
+        [PermissionMeta("查询自己拥有的权限", "用户", UserRole.Every, false)]
+        public ActionResult GetAllowedAuths()
+        {
+            var resource = MyMapper.Map<LinUserResource>(CurrentUser);
+
+            return Ok(resource);
+        }
+
+
         #region application/x-www-form-urlencoded登录测试方法
-        [AllowAnonymous]
+    [AllowAnonymous]
         [HttpPost("login")]
         [RequestHeaderMatchingMediaType("content-type", new[] { "application/x-www-form-urlencoded" })]
         public async Task<IActionResult> LoginByForm([FromForm] LinUserLoginResource linUserLoginResource)

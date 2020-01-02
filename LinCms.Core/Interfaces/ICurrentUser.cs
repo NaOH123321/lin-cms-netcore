@@ -6,6 +6,8 @@ namespace LinCms.Core.Interfaces
 {
     public interface ICurrentUser
     {
+        string? Token { get; }
+
         int Id { get; }
         string Username { get; }
         string? Nickname { get; }

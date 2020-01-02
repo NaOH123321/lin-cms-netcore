@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using LinCms.Core;
 using LinCms.Core.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -16,9 +17,17 @@ namespace LinCms.Api.Services
     {
         public IConfiguration Configuration { get; }
 
+        public SecurityKey ServerSecret { get; }
+        public string Issuer { get; }
+        public string Audience { get; }
+
         public TokenService(IConfiguration configuration)
         {
             Configuration = configuration;
+
+             ServerSecret = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:ServerSecret"]));
+             Issuer = Configuration["JWT:Issuer"];
+             Audience = Configuration["JWT:Audience"];
         }
 
         public int GetDurationInMinutes()
@@ -33,17 +42,14 @@ namespace LinCms.Api.Services
 
         public string GenerateAccessToken(IEnumerable<Claim> claims)
         {
-            var serverSecret = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:ServerSecret"]));
             var now = DateTime.Now;
-            var issuer = Configuration["JWT:Issuer"];
-            var audience = Configuration["JWT:Audience"];
             var identity = new ClaimsIdentity(claims);
-            var signingCredentials = new SigningCredentials(serverSecret, SecurityAlgorithms.HmacSha256);
+            var signingCredentials = new SigningCredentials(ServerSecret, SecurityAlgorithms.HmacSha256);
             var handler = new JwtSecurityTokenHandler();
 
             var token = handler.CreateJwtSecurityToken(
-                issuer,
-                audience,
+                Issuer,
+                Audience,
                 identity,
                 now,
                 DateTime.Now.AddMinutes(GetDurationInMinutes()),
@@ -66,14 +72,31 @@ namespace LinCms.Api.Services
         {
             var tokenValidationParameters = new TokenValidationParameters
             {
-                ValidIssuer = Configuration["JWT:Issuer"],
-                ValidAudience = Configuration["JWT:Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:ServerSecret"])),
-                ValidateLifetime = false 
+                ValidIssuer = Issuer,
+                ValidAudience = Audience,
+                IssuerSigningKey = ServerSecret,
+                ValidateLifetime = false
             };
 
+            return GetPrincipalFromToken(tokenValidationParameters, token);
+        }
+
+        public ClaimsPrincipal GetPrincipalFromValidToken(string token)
+        {
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidIssuer = Issuer,
+                ValidAudience = Audience,
+                IssuerSigningKey = ServerSecret,
+            };
+
+            return GetPrincipalFromToken(tokenValidationParameters, token);
+        }
+
+        private ClaimsPrincipal GetPrincipalFromToken(TokenValidationParameters parameters , string token)
+        {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out var securityToken);
+            var principal = tokenHandler.ValidateToken(token, parameters, out var securityToken);
             if (!(securityToken is JwtSecurityToken jwtSecurityToken) ||
                 !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256,
                     StringComparison.InvariantCultureIgnoreCase))

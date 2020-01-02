@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using LinCms.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -34,6 +36,14 @@ namespace LinCms.Api.Helpers
 
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
+            //如果有AllowAnonymous特性则不需要验证权限
+            var auditAction = (context.ActionDescriptor as ControllerActionDescriptor)?.MethodInfo;
+            var logAttribute = auditAction?.GetCustomAttribute<AllowAnonymousAttribute>();
+            if (logAttribute != null)
+            {
+                return;
+            }
+
             var authorizationService = context.HttpContext.RequestServices.GetRequiredService<IAuthorizationService>();
             var authorizationResult = await authorizationService.AuthorizeAsync(context.HttpContext.User, null,
                 new PermissionMetaRequirement

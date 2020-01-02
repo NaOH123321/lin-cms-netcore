@@ -92,6 +92,7 @@ namespace LinCms.Api
             });
 
             services.AddScoped<ICurrentUser, CurrentUser>();
+            services.AddScoped<ILinLogger, LinLogger>();
             ////设置跨域
             //services.AddCors();
             //注册资源映射关系 MappingProfile

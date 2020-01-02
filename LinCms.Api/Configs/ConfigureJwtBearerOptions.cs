@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using LinCms.Api.Services;
+using LinCms.Core;
 using LinCms.Core.Interfaces;
 using LinCms.Core.RepositoryInterfaces;
 using LinCms.Infrastructure.Messages;
@@ -43,6 +44,18 @@ namespace LinCms.Api.Configs
                     //    return Task.CompletedTask;
                     //},
 
+                    OnTokenValidated = context =>
+                    {
+                        var claims = context.Principal.Claims;
+                        var type = claims.FirstOrDefault(c => c.Type == TokenOption.Type)?.Value;
+                        if (type != TokenOption.AccessType)
+                        {
+                            context.Fail(new SecurityTokenValidationException());
+                        }
+
+                        return Task.CompletedTask;
+                    },
+
                     OnChallenge = context =>
                     {
                         var exception = context.AuthenticateFailure;
@@ -56,17 +69,13 @@ namespace LinCms.Api.Configs
                         context.Response.ContentType = MediaTypeNames.Application.Json;
                         context.Response.StatusCode = StatusCodes.Status401Unauthorized;
 
-                        if (exception is SecurityTokenValidationException ||
-                            exception is ArgumentException)
-                        {
-                            context.Response.WriteAsync(new UnauthorizedNotValidTokenMsg().ToJson());
-                        }
-
                         if (exception is SecurityTokenExpiredException)
                         {
                             context.Response.WriteAsync(new UnauthorizedTokenTimeoutMsg().ToJson());
+                            return Task.CompletedTask;
                         }
 
+                        context.Response.WriteAsync(new UnauthorizedNotValidTokenMsg().ToJson());
                         return Task.CompletedTask;
                     }
                 };

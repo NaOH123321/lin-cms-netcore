@@ -43,16 +43,6 @@ namespace LinCms.Infrastructure.Repositories
             return user;
         }
 
-        public async Task<bool> CheckPermission(int uid, string permissionName)
-        {
-            var currentUser = _linContext.LinUsers.Find(uid);
-
-            var linAuth = await _linContext.LinAuths.FirstOrDefaultAsync(auth =>
-                auth.GroupId == currentUser.GroupId && auth.Auth == permissionName);
-
-            return linAuth != null;
-        }
-
         public void Add(LinUser user)
         {
             _linContext.Add(user);
