@@ -10,9 +10,10 @@ namespace LinCms.Infrastructure.Resources.LinUsers
         public string Username { get; set; } = null!;
         public string? Nickname { get; set; }
         public string? Avatar { get; set; }
-        public short Admin { get; set; }
-        public short Active { get; set; }
         public string? Email { get; set; }
+        public bool IsAdmin { get; set; }
+        public bool IsActive { get; set; }
         public int? GroupId { get; set; }
+        public string? GroupName { get; set; }
     }
 }

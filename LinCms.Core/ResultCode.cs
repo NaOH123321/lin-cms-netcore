@@ -8,6 +8,12 @@ namespace LinCms.Core
         [Display(Name = "服务器错误")] 
         InternalServerErrorErrorCode = 99999,
 
+        [Display(Name = "成功")]
+        OkCode = 0,
+
+        [Display(Name = "创建成功")]
+        CreatedCode = 0,
+
         [Display(Name = "参数错误")] 
         BadRequestErrorCode = 10000,
 

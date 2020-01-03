@@ -15,6 +15,7 @@ namespace LinCms.Core.Interfaces
         bool IsAdmin { get; }
         bool IsActive { get; }
         string Role { get; }
+        int? GroupId { get; }
         string? GroupName { get; }
         List<LinAuth> Auths { get; }
 

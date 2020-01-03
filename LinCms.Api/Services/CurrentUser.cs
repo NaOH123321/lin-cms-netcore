@@ -24,6 +24,7 @@ namespace LinCms.Api.Services
         public bool IsAdmin { get; private set; }
         public bool IsActive { get; private set; }
         public string Role { get; private set; } = null!;
+        public int? GroupId { get; private set; }
         public string? GroupName { get; private set; }
         public List<LinAuth> Auths { get; private set; } = new List<LinAuth>();
 
@@ -72,6 +73,7 @@ namespace LinCms.Api.Services
         {
             if (group == null) return;
 
+            GroupId = group.Id;
             GroupName = group.Name;
             Auths = group.LinAuths.ToList();
 

@@ -17,7 +17,6 @@ namespace LinCms.Api.Services
         private readonly LinContext _linContext;
         private readonly IUnitOfWork _unitOfWork;
 
-
         private readonly List<string> _templateObj = new List<string>
         {
             "user", "response", "request"
@@ -66,23 +65,31 @@ namespace LinCms.Api.Services
                     continue;
                 }
 
-                string? item = null;
+                string? item;
+                var flag = false;
                 switch (logTemplate.ClassObj)
                 {
                     case "user":
-                        var propertyInfo = typeof(CurrentUser).GetProperty(logTemplate.Property,
+                        var propertyUser = typeof(CurrentUser).GetProperty(logTemplate.Property,
                             BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase);
-                        item = propertyInfo?.GetValue(currentUser)?.ToString();
+                        if (propertyUser == null) flag = true;
+                        item = propertyUser?.GetValue(currentUser)?.ToString();
                         break;
                     case "response":
-                        item = "ss";
+                        var propertyResponse = typeof(HttpResponse).GetProperty(logTemplate.Property,
+                            BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase);
+                        if (propertyResponse == null) flag = true;
+                        item = propertyResponse?.GetValue(_httpContextAccessor.HttpContext.Response)?.ToString();
                         break;
                     default:
-                        item = "ss";
+                        var propertyRequest = typeof(HttpRequest).GetProperty(logTemplate.Property,
+                            BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase);
+                        if (propertyRequest == null) flag = true;
+                        item = propertyRequest?.GetValue(_httpContextAccessor.HttpContext.Request)?.ToString();
                         break;
                 }
 
-                if (item == null) continue;
+                if (flag) continue;
 
                 newTemplate = newTemplate.Replace(logTemplate.Segment, item);
             }

@@ -11,6 +11,7 @@ using LinCms.Core;
 using LinCms.Core.Entities;
 using LinCms.Core.Interfaces;
 using LinCms.Core.RepositoryInterfaces;
+using LinCms.Infrastructure.Messages;
 using LinCms.Infrastructure.Resources.LinUsers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -36,7 +37,7 @@ namespace LinCms.Api.Controllers.Cms
         [HttpPost("register")]
         [Log("管理员新建了一个用户")]
         [PermissionMeta("注册", "用户", UserRole.Admin, false)]
-        public async Task<ActionResult<LinUserResource>> Register(LinUserAddResource linUserAddResource)
+        public async Task<ActionResult<string>> Register(LinUserAddResource linUserAddResource)
         {
             var user = MyMapper.Map<LinUserAddResource, LinUser>(linUserAddResource);
 
@@ -47,15 +48,13 @@ namespace LinCms.Api.Controllers.Cms
                 throw new Exception("Save Failed!");
             }
 
-            var resource = MyMapper.Map<LinUserResource>(user);
-            return Ok(resource);
-            //return CreatedAtRoute("GetBook", new { id = resource.Id }, resource);
+            return new CreatedMsg().ToJson();
         }
 
         [AllowAnonymous]
         [HttpPost("login")]
         [PermissionMeta("登陆", "用户", UserRole.Every, false)]
-        public async Task<ActionResult> Login(LinUserLoginResource linUserLoginResource)
+        public async Task<ActionResult<object>> Login(LinUserLoginResource linUserLoginResource)
         {
             var user = await _linUserRepository.Verify(linUserLoginResource.Username, linUserLoginResource.Password);
             if (user == null)
@@ -85,7 +84,7 @@ namespace LinCms.Api.Controllers.Cms
         [AllowAnonymous]
         [HttpGet("refresh")]
         [PermissionMeta("刷新令牌", "用户", UserRole.Every, false)]
-        public ActionResult Refresh()
+        public ActionResult<object> Refresh()
         {
             string userId;
             try
@@ -106,16 +105,23 @@ namespace LinCms.Api.Controllers.Cms
 
         [HttpGet("information")]
         [PermissionMeta("查询自己信息", "用户", UserRole.Every, false)]
-        public ActionResult Information()
+        public ActionResult<LinUserResource> Information()
         {
             var resource = MyMapper.Map<LinUserResource>(CurrentUser);
+            return Ok(resource);
+        }
 
+        [HttpGet("auths")]
+        [PermissionMeta("查询自己拥有的权限", "用户", UserRole.Every, false)]
+        public ActionResult<LinUserWithAuthsResource> GetAllowedAuths()
+        {
+            var resource = MyMapper.Map<LinUserWithAuthsResource>(CurrentUser);
             return Ok(resource);
         }
 
         [HttpPut]
         [PermissionMeta("用户更新信息", "用户", UserRole.Every, false)]
-        public ActionResult UpdateInformation()
+        public ActionResult<LinUserResource> UpdateInformation()
         {
             var resource = MyMapper.Map<LinUserResource>(CurrentUser);
 
@@ -125,16 +131,7 @@ namespace LinCms.Api.Controllers.Cms
         [HttpPut("change_password")]
         [Log("{user.username}修改了自己的密码")]
         [PermissionMeta("修改密码", "用户", UserRole.Every, false)]
-        public ActionResult ChangePassword()
-        {
-            var resource = MyMapper.Map<LinUserResource>(CurrentUser);
-
-            return Ok(resource);
-        }
-
-        [HttpGet("auths")]
-        [PermissionMeta("查询自己拥有的权限", "用户", UserRole.Every, false)]
-        public ActionResult GetAllowedAuths()
+        public ActionResult<LinUserResource> ChangePassword()
         {
             var resource = MyMapper.Map<LinUserResource>(CurrentUser);
 
@@ -145,7 +142,7 @@ namespace LinCms.Api.Controllers.Cms
         {
             var result = new
             {
-                token = _tokenService.GenerateAccessToken(new[]
+                accessToken = _tokenService.GenerateAccessToken(new[]
                 {
                     new Claim(ClaimTypes.NameIdentifier, uid),
                     new Claim(TokenOption.Type, TokenOption.AccessType)
@@ -154,7 +151,7 @@ namespace LinCms.Api.Controllers.Cms
                 {
                     new Claim(ClaimTypes.NameIdentifier, uid),
                     new Claim(TokenOption.Type, TokenOption.RefreshType)
-                }),
+                })
             };
 
             return result;
