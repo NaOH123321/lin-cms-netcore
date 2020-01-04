@@ -8,8 +8,6 @@ namespace LinCms.Infrastructure.Resources.LinUsers
     {
         public string Username { get; set; } = null!;
         public string Password { get; set; } = null!;
-        //public string? Nickname { get; set; }
-        //public string? Avatar { get; set; }
         public string? Email { get; set; }
         public int GroupId { get; set; }
     }

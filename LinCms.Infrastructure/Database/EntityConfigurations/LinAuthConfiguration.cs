@@ -32,7 +32,7 @@ namespace LinCms.Infrastructure.Database.EntityConfigurations
                 .WithMany(o => o.LinAuths)
                 .HasPrincipalKey(o => o.Id)
                 .HasForeignKey(b => b.GroupId)
-                .OnDelete(DeleteBehavior.ClientSetNull);
+                .OnDelete(DeleteBehavior.ClientNoAction);
         }
     }
 }

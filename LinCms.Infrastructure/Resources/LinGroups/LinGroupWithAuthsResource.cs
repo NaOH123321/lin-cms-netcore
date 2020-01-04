@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using LinCms.Infrastructure.Resources.LinAuths;
 
-namespace LinCms.Infrastructure.Resources.LinUsers
+namespace LinCms.Infrastructure.Resources.LinGroups
 {
-    public class LinUserWithAuthsResource : LinUserResource
+    public class LinGroupWithAuthsResource : LinGroupResource
     {
-        public LinUserWithAuthsResource()
+        public LinGroupWithAuthsResource()
         {
             Auths = new List<Dictionary<string, IEnumerable<LinAuthResource>>>();
         }

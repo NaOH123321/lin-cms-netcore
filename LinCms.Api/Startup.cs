@@ -64,7 +64,7 @@ namespace LinCms.Api
                         NamingStrategy = new SnakeCaseNamingStrategy { ProcessDictionaryKeys = true }
                     };
                     options.SerializerSettings.Formatting = Formatting.Indented;
-                    options.SerializerSettings.DateFormatString = "yyyy-MM-dd";
+                    options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
                 })
                 .AddFluentValidation(cf =>
                 {
@@ -125,6 +125,8 @@ namespace LinCms.Api
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseSnakeCaseQuery();
 
             app.UseStatusCodeHandling();
 

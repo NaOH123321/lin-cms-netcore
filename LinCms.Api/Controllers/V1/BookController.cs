@@ -87,7 +87,6 @@ namespace LinCms.Api.Controllers.V1
             return Ok(resource);
         }
 
-        [PermissionMeta(role: "Admin")]
         [PermissionMeta("删除图书", "图书")]
         [HttpDelete("{id}",Name = "DeleteBook")]
         public async Task<ActionResult> Delete(int id)

@@ -20,7 +20,9 @@ namespace LinCms.Infrastructure.Validators
                 .WithName("用户名")
                 .WithMessage(FluentValidatorMessage.EmptyMessage)
                 .Length(2, 10)
-                .WithMessage(FluentValidatorMessage.MinLengthAndMaxLengthMessage);
+                .WithMessage(FluentValidatorMessage.MinLengthAndMaxLengthMessage)
+                .Must(x => !linContext.LinUsers.Any(b => b.Username == x))
+                .WithMessage(FluentValidatorMessage.ExistedMessage);
 
             RuleFor(x => x.Password)
                 .NotEmpty()
@@ -45,7 +47,9 @@ namespace LinCms.Infrastructure.Validators
             RuleFor(x => x.Email)
                 .EmailAddress()
                 .WithName("电子邮箱")
-                .WithMessage(FluentValidatorMessage.RequiredMessage);
+                .WithMessage(FluentValidatorMessage.RequiredMessage)
+                .Must(x => string.IsNullOrWhiteSpace(x) || !linContext.LinUsers.Any(b => b.Email == x))
+                .WithMessage(FluentValidatorMessage.ExistedMessage);
         }
     }
 }

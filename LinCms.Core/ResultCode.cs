@@ -11,9 +11,6 @@ namespace LinCms.Core
         [Display(Name = "成功")]
         OkCode = 0,
 
-        [Display(Name = "创建成功")]
-        CreatedCode = 0,
-
         [Display(Name = "参数错误")] 
         BadRequestErrorCode = 10000,
 
@@ -48,6 +45,9 @@ namespace LinCms.Core
         [Display(Name = "权限验证不通过")]
         ResourceUnauthorizedErrorCode = 12000,
 
+        [Display(Name = "资源禁止访问")]
+        ResourceForbiddenErrorCode = 13000,
+
         //用户错误类
         [Display(Name = "用户不存在")]
         UserNotFoundErrorCode = 20000,
@@ -57,5 +57,17 @@ namespace LinCms.Core
 
         [Display(Name = "您目前处于未激活状态，请联系超级管理员")]
         UserInactiveErrorCode = 21000,
+
+        [Display(Name = "当前用户已处于禁止状态")]
+        UserShouldBeActiveErrorCode = 21010,
+
+        [Display(Name = "当前用户已处于激活状态")]
+        UserShouldBeNotActiveErrorCode = 21020,
+
+        [Display(Name = "分组不存在")]
+        GroupNotFoundErrorCode = 22000,
+
+        [Display(Name = "分组下存在用户，不可删除")]
+        GroupHasUserErrorCode = 22010,
     }
 }

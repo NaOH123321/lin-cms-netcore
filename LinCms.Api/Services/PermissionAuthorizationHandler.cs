@@ -19,7 +19,7 @@ namespace LinCms.Api.Services
 
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, PermissionMetaRequirement requirement)
         {
-            if (_currentUser.IsAdmin)
+            if (_currentUser.IsAdmin || requirement.Role == UserRole.Every)
             {
                 context.Succeed(requirement);
                 return Task.CompletedTask;

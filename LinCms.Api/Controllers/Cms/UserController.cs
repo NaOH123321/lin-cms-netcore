@@ -37,7 +37,7 @@ namespace LinCms.Api.Controllers.Cms
         [HttpPost("register")]
         [Log("管理员新建了一个用户")]
         [PermissionMeta("注册", "用户", UserRole.Admin, false)]
-        public async Task<ActionResult<string>> Register(LinUserAddResource linUserAddResource)
+        public async Task<ActionResult<CreatedMsg>> Register(LinUserAddResource linUserAddResource)
         {
             var user = MyMapper.Map<LinUserAddResource, LinUser>(linUserAddResource);
 
@@ -48,7 +48,7 @@ namespace LinCms.Api.Controllers.Cms
                 throw new Exception("Save Failed!");
             }
 
-            return new CreatedMsg().ToJson();
+            return Created("", new CreatedMsg());
         }
 
         [AllowAnonymous]
@@ -121,13 +121,24 @@ namespace LinCms.Api.Controllers.Cms
 
         [HttpPut]
         [PermissionMeta("用户更新信息", "用户", UserRole.Every, false)]
-        public ActionResult<LinUserResource> UpdateInformation()
+        public async Task<ActionResult<LinUserResource>> UpdateInformation(LinUserUpdateResource linUserUpdateResource)
         {
-            var resource = MyMapper.Map<LinUserResource>(CurrentUser);
+            var user = await _linUserRepository.GetDetailAsync(CurrentUser.Id);
+            user!.Email = linUserUpdateResource.Email ?? user.Email;
+            user!.Nickname = linUserUpdateResource.Nickname ?? user.Nickname;
 
+            _linUserRepository.Update(user);
+
+            if (!await UnitOfWork.SaveAsync())
+            {
+                throw new Exception("Save Failed!");
+            }
+
+            var resource = MyMapper.Map<LinUserResource>(user);
             return Ok(resource);
         }
 
+        //notCompleted
         [HttpPut("change_password")]
         [Log("{user.username}修改了自己的密码")]
         [PermissionMeta("修改密码", "用户", UserRole.Every, false)]
@@ -135,6 +146,24 @@ namespace LinCms.Api.Controllers.Cms
         {
             var resource = MyMapper.Map<LinUserResource>(CurrentUser);
 
+            return Ok(resource);
+        }
+
+        [HttpPut("avatar")]
+        [PermissionMeta(UserRole.Every)]
+        public async Task<ActionResult<LinUserResource>> ChangeAvatar(LinUserUpdateResource linUserUpdateResource)
+        {
+            var user = await _linUserRepository.GetDetailAsync(CurrentUser.Id);
+            user!.Avatar = linUserUpdateResource.Avatar ?? user.Avatar;
+
+            _linUserRepository.Update(user);
+
+            if (!await UnitOfWork.SaveAsync())
+            {
+                throw new Exception("Save Failed!");
+            }
+
+            var resource = MyMapper.Map<LinUserResource>(user);
             return Ok(resource);
         }
 

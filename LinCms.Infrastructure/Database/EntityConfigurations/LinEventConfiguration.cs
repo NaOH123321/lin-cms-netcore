@@ -28,7 +28,7 @@ namespace LinCms.Infrastructure.Database.EntityConfigurations
                 .WithMany(o => o.LinEvents)
                 .HasPrincipalKey(o => o.Id)
                 .HasForeignKey(b => b.GroupId)
-                .OnDelete(DeleteBehavior.ClientSetNull);
+                .OnDelete(DeleteBehavior.ClientNoAction);
         }
     }
 }
