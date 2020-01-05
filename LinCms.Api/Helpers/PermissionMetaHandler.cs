@@ -70,6 +70,12 @@ namespace LinCms.Api.Helpers
                 }
             }
 
+            //判断是否有重复的auth
+            if (permissionMetas.GroupBy(i => i.Auth).Where(g => g.Key != null).Any(g => g.Count() > 1))
+            {
+                throw new Exception("不能有重复的权限名称, 请联系超级管理员");
+            }
+
             return permissionMetas;
         }
 

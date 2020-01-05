@@ -28,6 +28,8 @@ namespace LinCms.Api.AutoMapper.Profiles
                 .ForMember(dest => dest.Auths, opt => opt.MapFrom(src => src.Auths));
 
             CreateMap<LinUserAddResource, LinUser>();
+            CreateMap<LinUserUpdateResource, LinUser>();
+            CreateMap<LinUserUpdateByAdminResource, LinUser>();
         }
     }
 }

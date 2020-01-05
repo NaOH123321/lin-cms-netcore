@@ -5,48 +5,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Migrations\20191228095642_int.cs" />
-    <Compile Remove="Migrations\20191228095642_int.Designer.cs" />
-    <Compile Remove="Migrations\20191228101902_int.cs" />
-    <Compile Remove="Migrations\20191228101902_int.Designer.cs" />
-    <Compile Remove="Migrations\20191228103653_int.cs" />
-    <Compile Remove="Migrations\20191228103653_int.Designer.cs" />
-    <Compile Remove="Migrations\20191228154454_init.cs" />
-    <Compile Remove="Migrations\20191228154454_init.Designer.cs" />
-    <Compile Remove="Migrations\20191228155356_init.cs" />
-    <Compile Remove="Migrations\20191228155356_init.Designer.cs" />
-    <Compile Remove="Migrations\20191228160020_init.cs" />
-    <Compile Remove="Migrations\20191228160020_init.Designer.cs" />
-    <Compile Remove="Migrations\20191230020328_init.cs" />
-    <Compile Remove="Migrations\20191230020328_init.Designer.cs" />
-    <Compile Remove="Migrations\20191230030343_init.cs" />
-    <Compile Remove="Migrations\20191230030343_init.Designer.cs" />
-    <Compile Remove="Migrations\20191230030713_init.cs" />
-    <Compile Remove="Migrations\20191230030713_init.Designer.cs" />
-    <Compile Remove="Migrations\20191230120347_init.cs" />
-    <Compile Remove="Migrations\20191230120347_init.Designer.cs" />
-    <Compile Remove="Migrations\20191230120738_testmany.cs" />
-    <Compile Remove="Migrations\20191230120738_testmany.Designer.cs" />
-    <Compile Remove="Migrations\20191230132500_testmany.cs" />
-    <Compile Remove="Migrations\20191230132500_testmany.Designer.cs" />
-    <Compile Remove="Migrations\20191230141111_testmany.cs" />
-    <Compile Remove="Migrations\20191230141111_testmany.Designer.cs" />
-    <Compile Remove="Migrations\20191230144519_testmany.cs" />
-    <Compile Remove="Migrations\20191230144519_testmany.Designer.cs" />
-    <Compile Remove="Migrations\20191230144842_testmany.cs" />
-    <Compile Remove="Migrations\20191230144842_testmany.Designer.cs" />
-    <Compile Remove="Migrations\20191230151138_testmany.cs" />
-    <Compile Remove="Migrations\20191230151138_testmany.Designer.cs" />
-    <Compile Remove="Migrations\20191230152102_testmany.cs" />
-    <Compile Remove="Migrations\20191230152102_testmany.Designer.cs" />
-    <Compile Remove="Migrations\20191230154252_testmany.cs" />
-    <Compile Remove="Migrations\20191230154252_testmany.Designer.cs" />
-    <Compile Remove="Migrations\20191230154602_testmany.cs" />
-    <Compile Remove="Migrations\20191230154602_testmany.Designer.cs" />
-    <Compile Remove="Migrations\20191230154742_testmany.cs" />
-    <Compile Remove="Migrations\20191230154742_testmany.Designer.cs" />
-  </ItemGroup>
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
@@ -56,11 +18,16 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.0" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.1.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc5" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\LinCms.Core\LinCms.Core.csproj" />
     <ProjectReference Include="..\LinCms.Infrastructure\LinCms.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
   </ItemGroup>
 
 </Project>

@@ -14,10 +14,13 @@ namespace LinCms.Core.RepositoryInterfaces
 
         Task<PaginatedList<LinUser>> GetAllUsersWithGroupAsync(AdminParameters adminParameters);
         Task<PaginatedList<LinGroup>> GetAllGroupsWithAuthAsync(AdminParameters adminParameters);
+        Task<IEnumerable<LinUser>> GetAllUsersAsync();
         Task<IEnumerable<LinGroup>> GetAllGroupsAsync();
+        Task<IEnumerable<LinAuth>> GetAllAuthsAsync();
 
         void Add(LinUser user);
         void Add(LinGroup group);
+        void AddRange(IEnumerable<LinAuth> auths);
 
         void Update(LinUser user);
         void Update(LinGroup group);

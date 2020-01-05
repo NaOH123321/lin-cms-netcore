@@ -18,6 +18,9 @@ namespace LinCms.Api.AutoMapper.Profiles
             CreateMap<LinGroup, LinGroupResource>();
             CreateMap<LinGroup, LinGroupWithAuthsResource>()
                 .ForMember(dest => dest.Auths, opt => opt.MapFrom(src => src.LinAuths));
+
+            CreateMap<LinGroupAddResource, LinGroup>();
+            CreateMap<LinGroupUpdateResource, LinGroup>();
         }
     }
 }

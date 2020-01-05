@@ -9,6 +9,7 @@ using LinCms.Core.Entities;
 using LinCms.Core.EntityQueryParameters;
 using LinCms.Core.Interfaces;
 using LinCms.Core.RepositoryInterfaces;
+using LinCms.Infrastructure.Messages;
 using LinCms.Infrastructure.Resources.LinGroups;
 using LinCms.Infrastructure.Resources.LinUsers;
 using Microsoft.AspNetCore.Authorization;
@@ -16,6 +17,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LinCms.Api.Controllers.Cms
 {
+    /// <summary>
+    /// 管理员接口
+    /// </summary>
+    [Produces("application/json")]
     [PermissionMeta(UserRole.Admin)]
     [Route("cms/admin")]
     public class AdminController : BasicController
@@ -27,6 +32,11 @@ namespace LinCms.Api.Controllers.Cms
             _adminRepository = adminRepository;
         }
 
+        /// <summary>
+        /// 查询所有可分配的权限
+        /// </summary>
+        /// <returns>A newly created TodoItem</returns>
+        /// <response code="200">返回可分配的权限的列表</response>
         [HttpGet("authority")]
         [PermissionMeta("查询所有可分配的权限", "管理员", mount:false)]
         public ActionResult<IEnumerable<PermissionMeta>> GetAllAuthorities()
@@ -36,7 +46,11 @@ namespace LinCms.Api.Controllers.Cms
             return Ok(resource);
         }
 
-
+        /// <summary>
+        /// 查询所有用户
+        /// </summary>
+        /// <param name="adminParameters"></param>
+        /// <returns></returns>
         [HttpGet("users")]
         [PermissionMeta("查询所有用户", "管理员", mount: false)]
         public async Task<ActionResult<PaginatedResult<LinUserResource>>> GetAllUsers([FromQuery] AdminParameters adminParameters)
@@ -50,10 +64,52 @@ namespace LinCms.Api.Controllers.Cms
             return Ok(result);
         }
 
+        [HttpPut("{uid}")]
+        [PermissionMeta("管理员更新用户信息", "管理员", mount: false)]
+        public async Task<ActionResult<LinUserResource>> UpdateUser(int uid, LinUserUpdateByAdminResource linUserUpdateByAdminResource)
+        {
+            var user = await _adminRepository.GetUserAsync(uid);
+
+            if (user == null)
+            {
+                throw new NotFoundException
+                {
+                    ErrorCode = ResultCode.UserNotFoundErrorCode
+                };
+            }
+
+            if (linUserUpdateByAdminResource.Email != user.Email)
+            {
+                var users =await _adminRepository.GetAllUsersAsync();
+
+                if (users.Any(u => u.Email == linUserUpdateByAdminResource.Email))
+                {
+                    throw new BadRequestException
+                    {
+                        ErrorCode = ResultCode.UserEmailExsitedErrorCode
+                    };
+                }
+            }
+
+            MyMapper.Map(linUserUpdateByAdminResource, user);
+
+            _adminRepository.Update(user);
+
+            if (!await UnitOfWork.SaveAsync())
+            {
+                throw new Exception("Save Failed!");
+            }
+
+            var resource = MyMapper.Map<LinUserResource>(user);
+
+            return Ok(resource);
+        }
+
+
         [HttpDelete("{uid}")]
         [Log("管理员删除了一个用户")]
         [PermissionMeta("删除用户", "管理员", mount: false)]
-        public async Task<ActionResult> DeleteUser(int uid)
+        public async Task<ActionResult<OkMsg>> DeleteUser(int uid)
         {
             var user = await _adminRepository.GetUserAsync(uid);
 
@@ -72,12 +128,15 @@ namespace LinCms.Api.Controllers.Cms
                 throw new Exception("Save Failed!");
             }
 
-            return NoContent();
+            return Ok(new OkMsg
+            {
+                Msg = "删除用户成功"
+            });
         }
 
         [HttpPut("disable/{uid}")]
         [PermissionMeta("禁用用户", "管理员", mount: false)]
-        public async Task<ActionResult> DisableUser(int uid)
+        public async Task<ActionResult<OkMsg>> DisableUser(int uid)
         {
             var user = await _adminRepository.GetUserAsync(uid);
 
@@ -104,12 +163,15 @@ namespace LinCms.Api.Controllers.Cms
                 throw new Exception("Save Failed!");
             }
 
-            return NoContent();
+            return Ok(new OkMsg
+            {
+                Msg = "禁用用户成功"
+            });
         }
 
         [HttpPut("active/{uid}")]
         [PermissionMeta("激活用户", "管理员", mount: false)]
-        public async Task<ActionResult> ActiveUser(int uid)
+        public async Task<ActionResult<OkMsg>> ActiveUser(int uid)
         {
             var user = await _adminRepository.GetUserAsync(uid);
 
@@ -136,7 +198,10 @@ namespace LinCms.Api.Controllers.Cms
                 throw new Exception("Save Failed!");
             }
 
-            return NoContent();
+            return Ok(new OkMsg
+            {
+                Msg = "激活用户成功"
+            });
         }
 
 
@@ -183,12 +248,65 @@ namespace LinCms.Api.Controllers.Cms
             return Ok(resource);
         }
 
+        [HttpPost("group")]
+        [Log("管理员新建了一个权限组")]
+        [PermissionMeta("新建权限组", "管理员", mount: false)]
+        public async Task<ActionResult<LinGroupWithAuthsResource>> AddGroup(LinGroupAddResource linGroupAddResource)
+        {
+            var group = MyMapper.Map<LinGroupAddResource, LinGroup>(linGroupAddResource);
 
+            var dispatchedMetas = PermissionMetaHandler.GetAllDispatchedMetas();
+
+            var permissionMetas = dispatchedMetas.Where(meta => linGroupAddResource.Auths.Contains(meta.Auth));
+
+            var linAuths = MyMapper.Map<IEnumerable<PermissionMeta>, IEnumerable<LinAuth>>(permissionMetas);
+
+            group.LinAuths = linAuths.ToList();
+
+            _adminRepository.Add(group);
+
+            if (!await UnitOfWork.SaveAsync())
+            {
+                throw new Exception("Save Failed!");
+            }
+
+            var resource = MyMapper.Map<LinGroup, LinGroupWithAuthsResource>(group);
+
+            return Ok(resource);
+        }
+
+        [HttpPut("group/{gid}")]
+        [PermissionMeta("更新一个权限组", "管理员", mount: false)]
+        public async Task<ActionResult<LinGroupWithAuthsResource>> UpdateGroup(int gid, LinGroupUpdateResource linGroupUpdateResource)
+        {
+            var group = await _adminRepository.GetGroupWithAuthAndUserAsync(gid);
+
+            if (group == null)
+            {
+                throw new NotFoundException
+                {
+                    ErrorCode = ResultCode.GroupNotFoundErrorCode
+                };
+            }
+
+            MyMapper.Map(linGroupUpdateResource, group);
+
+            _adminRepository.Update(group);
+
+            if (!await UnitOfWork.SaveAsync())
+            {
+                throw new Exception("Save Failed!");
+            }
+
+            var resource = MyMapper.Map<LinGroup, LinGroupWithAuthsResource>(group);
+
+            return Ok(resource);
+        }
 
         [HttpDelete("group/{pid}")]
         [Log("管理员删除一个权限组")]
         [PermissionMeta("删除一个权限组", "管理员", mount: false)]
-        public async Task<ActionResult> DeleteGroup(int pid)
+        public async Task<ActionResult<OkMsg>> DeleteGroup(int pid)
         {
             var group = await _adminRepository.GetGroupWithAuthAndUserAsync(pid);
 
@@ -216,7 +334,65 @@ namespace LinCms.Api.Controllers.Cms
                 throw new Exception("Save Failed!");
             }
 
-            return NoContent();
+            return Ok(new OkMsg
+            {
+                Msg = "删除分组成功"
+            });
+        }
+
+        [HttpPost("dispatch/patch")]
+        [PermissionMeta("分配多个权限", "管理员", mount: false)]
+        public async Task<ActionResult<OkMsg>> DispatchAuths(
+            LinGroupDispatchAuthsResource linGroupDispatchAuthsResource)
+        {
+            var linAuths = new List<LinAuth>();
+            var dispatchedMetas = PermissionMetaHandler.GetAllDispatchedMetas();
+
+            var auths = (await _adminRepository.GetAllAuthsAsync()).ToList();
+
+            foreach (var auth in linGroupDispatchAuthsResource.Auths)
+            {
+               var exsitedLinAuth =  auths.SingleOrDefault(a => a.GroupId == linGroupDispatchAuthsResource.GroupId && a.Auth == auth);
+               if (exsitedLinAuth == null)
+               {
+                   var meta = dispatchedMetas.SingleOrDefault(m => m.Auth == auth);
+                   if (meta != null)
+                   {
+                       var linAuth = MyMapper.Map<PermissionMeta, LinAuth>(meta);
+                       linAuths.Add(linAuth);
+                   }
+               }
+            }
+
+            _adminRepository.AddRange(linAuths);
+
+            await UnitOfWork.SaveAsync();
+
+            return Ok(new OkMsg
+            {
+                Msg = "添加权限成功"
+            });
+        }
+
+        [HttpPost("remove")]
+        [PermissionMeta("删除多个权限", "管理员", mount: false)]
+        public async Task<ActionResult<OkMsg>> RemoveAuths(
+            LinGroupDispatchAuthsResource linGroupDispatchAuthsResource)
+        {
+            var auths = await _adminRepository.GetAllAuthsAsync();
+
+            var linAuths = auths.Where(auth =>
+                auth.GroupId == linGroupDispatchAuthsResource.GroupId &&
+                linGroupDispatchAuthsResource.Auths.Contains(auth.Auth)).ToList();
+
+            _adminRepository.DeleteRange(linAuths);
+
+            await UnitOfWork.SaveAsync();
+
+            return Ok(new OkMsg
+            {
+                Msg = "删除权限成功"
+            });
         }
     }
 }

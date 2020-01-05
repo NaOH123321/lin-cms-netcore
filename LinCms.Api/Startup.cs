@@ -93,8 +93,12 @@ namespace LinCms.Api
 
             services.AddScoped<ICurrentUser, CurrentUser>();
             services.AddScoped<ILinLogger, LinLogger>();
-            ////设置跨域
-            //services.AddCors();
+
+
+            //设置Swagger
+            services.AddMySwaggerGen();
+            //设置跨域
+            services.AddCors();
             //注册资源映射关系 MappingProfile
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             //校验资源
@@ -121,7 +125,25 @@ namespace LinCms.Api
                 app.UseMyExceptionHandler();
                 app.UseHsts();
             }
-            
+
+            app.UseStaticFiles();
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "LinCms V1");
+                c.RoutePrefix = string.Empty;
+            });
+
+            app.UseCors(builder =>
+            {
+                string[] withOrigins = Configuration.GetSection("WithOrigins").Get<string[]>();
+                builder.AllowAnyHeader();
+                builder.AllowAnyMethod();
+                builder.AllowCredentials();
+                builder.WithOrigins(withOrigins);
+            });
+
             app.UseHttpsRedirection();
 
             app.UseRouting();

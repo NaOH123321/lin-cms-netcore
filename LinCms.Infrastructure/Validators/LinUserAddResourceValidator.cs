@@ -24,18 +24,30 @@ namespace LinCms.Infrastructure.Validators
                 .Must(x => !linContext.LinUsers.Any(b => b.Username == x))
                 .WithMessage(FluentValidatorMessage.ExistedMessage);
 
-            RuleFor(x => x.Password)
-                .NotEmpty()
-                .WithName("密码")
-                .WithMessage(FluentValidatorMessage.EmptyMessage);
 
-            RuleFor(x => x.Password)
-                .Cascade(CascadeMode.Continue)
-                .Length(6, 22)
-                .WithName("密码")
-                .WithMessage(FluentValidatorMessage.MinLengthAndMaxLengthMessage)
-                .Matches("^[A-Za-z0-9_*&$#@]")
-                .WithMessage("required|{PropertyName}需要包含字符、数字和 _");
+            RuleFor(x => new ValueTuple<string, string>(x.Password, x.ConfirmPassword))
+                .SetValidator(new PasswordValidator());
+
+            //RuleFor(x => x.Password)
+            //    .NotEmpty()
+            //    .WithName("新密码")
+            //    .WithMessage(FluentValidatorMessage.EmptyMessage);
+
+            //RuleFor(x => x.Password)
+            //    .Cascade(CascadeMode.Continue)
+            //    .Length(6, 22)
+            //    .WithName("新密码")
+            //    .WithMessage(FluentValidatorMessage.MinLengthAndMaxLengthMessage)
+            //    .Matches("^[A-Za-z0-9_*&$#@]")
+            //    .WithMessage("required|{PropertyName}需要包含字符、数字和 _");
+
+            //RuleFor(x => x.ConfirmPassword)
+            //    .Cascade(CascadeMode.Continue)
+            //    .NotEmpty()
+            //    .WithName("确认新密码")
+            //    .WithMessage(FluentValidatorMessage.EmptyMessage)
+            //    .Must((t, x) => x == t.Password)
+            //    .WithMessage("required|两次输入的密码不一致，请输入相同的密码");
 
             RuleFor(x => x.GroupId)
                 .NotEmpty()

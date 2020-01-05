@@ -8,6 +8,7 @@ using LinCms.Core;
 using LinCms.Core.Entities;
 using LinCms.Core.EntityQueryParameters;
 using LinCms.Core.RepositoryInterfaces;
+using LinCms.Infrastructure.Messages;
 using LinCms.Infrastructure.Resources;
 using LinCms.Infrastructure.Resources.Books;
 using Microsoft.AspNetCore.Authorization;
@@ -89,7 +90,7 @@ namespace LinCms.Api.Controllers.V1
 
         [PermissionMeta("删除图书", "图书")]
         [HttpDelete("{id}",Name = "DeleteBook")]
-        public async Task<ActionResult> Delete(int id)
+        public async Task<ActionResult<OkMsg>> Delete(int id)
         {
             var book = await _bookRepository.GetDetailAsync(id);
             if (book == null)
@@ -104,7 +105,10 @@ namespace LinCms.Api.Controllers.V1
                 throw new Exception("Save Failed!");
             }
 
-            return NoContent();
+            return Ok(new OkMsg
+            {
+                Msg = "删除图书成功"
+            });
         }
     }
 }

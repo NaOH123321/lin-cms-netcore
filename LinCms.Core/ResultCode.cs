@@ -55,6 +55,9 @@ namespace LinCms.Core
         [Display(Name = "密码错误，请输入正确密码")]
         UserPasswordErrorCode = 20010,
 
+        [Display(Name = "邮箱已被注册，请重新输入邮箱")]
+        UserEmailExsitedErrorCode = 20020,
+
         [Display(Name = "您目前处于未激活状态，请联系超级管理员")]
         UserInactiveErrorCode = 21000,
 
@@ -64,10 +67,10 @@ namespace LinCms.Core
         [Display(Name = "当前用户已处于激活状态")]
         UserShouldBeNotActiveErrorCode = 21020,
 
-        [Display(Name = "分组不存在")]
+        [Display(Name = "权限分组不存在")]
         GroupNotFoundErrorCode = 22000,
 
-        [Display(Name = "分组下存在用户，不可删除")]
+        [Display(Name = "权限分组下存在用户，不可删除")]
         GroupHasUserErrorCode = 22010,
     }
 }

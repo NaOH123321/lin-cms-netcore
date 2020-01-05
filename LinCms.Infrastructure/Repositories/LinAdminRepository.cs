@@ -78,9 +78,29 @@ namespace LinCms.Infrastructure.Repositories
 
             return new PaginatedList<LinGroup>(adminParameters.Page, adminParameters.Count, total, data);
         }
+
+        public async Task<IEnumerable<LinUser>> GetAllUsersAsync()
+        {
+            var query = _linContext.LinUsers
+                .AsQueryable();
+
+            var data = await query.ToListAsync();
+
+            return data;
+        }
         public async Task<IEnumerable<LinGroup>> GetAllGroupsAsync()
         {
             var query = _linContext.LinGroups
+                .AsQueryable();
+
+            var data = await query.ToListAsync();
+
+            return data;
+        }
+
+        public async Task<IEnumerable<LinAuth>> GetAllAuthsAsync()
+        {
+            var query = _linContext.LinAuths
                 .AsQueryable();
 
             var data = await query.ToListAsync();
@@ -96,6 +116,11 @@ namespace LinCms.Infrastructure.Repositories
         public void Add(LinGroup group)
         {
             _linContext.Add(group);
+        }
+
+        public void AddRange(IEnumerable<LinAuth> auths)
+        {
+            _linContext.AddRange(auths);
         }
 
         public void Update(LinUser user)

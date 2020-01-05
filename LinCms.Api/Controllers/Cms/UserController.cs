@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LinCms.Api.Controllers.Cms
 {
+    [Produces("application/json")]
     [Authorize]
     [Route("cms/user")]
     public class UserController : BasicController
@@ -34,10 +35,26 @@ namespace LinCms.Api.Controllers.Cms
             _linLogger = linLogger;
         }
 
+        /// <summary>
+        /// 注册用户
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     GET /Todo
+        ///     {
+        ///        "id": 1,
+        ///        "name": "Item1",
+        ///        "isComplete": true
+        ///     }
+        ///
+        /// </remarks>
+        /// <param name="linUserAddResource"></param>
+        /// <returns></returns>
         [HttpPost("register")]
         [Log("管理员新建了一个用户")]
         [PermissionMeta("注册", "用户", UserRole.Admin, false)]
-        public async Task<ActionResult<CreatedMsg>> Register(LinUserAddResource linUserAddResource)
+        public async Task<ActionResult<LinUserResource>> Register(LinUserAddResource linUserAddResource)
         {
             var user = MyMapper.Map<LinUserAddResource, LinUser>(linUserAddResource);
 
@@ -48,7 +65,8 @@ namespace LinCms.Api.Controllers.Cms
                 throw new Exception("Save Failed!");
             }
 
-            return Created("", new CreatedMsg());
+            var resource = MyMapper.Map<LinUserResource>(user);
+            return Created("", resource);
         }
 
         [AllowAnonymous]
@@ -188,7 +206,8 @@ namespace LinCms.Api.Controllers.Cms
 
         #region application/x-www-form-urlencoded登录测试方法
         [AllowAnonymous]
-        [HttpPost("login")]
+        [HttpPost("login1")]
+        [ApiExplorerSettings(IgnoreApi = true)]
         [RequestHeaderMatchingMediaType("content-type", new[] { "application/x-www-form-urlencoded" })]
         public async Task<IActionResult> LoginByForm([FromForm] LinUserLoginResource linUserLoginResource)
         {
