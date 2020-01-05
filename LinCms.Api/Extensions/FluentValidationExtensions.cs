@@ -15,6 +15,11 @@ namespace LinCms.Api.Extensions
     {
         public static void AddFluentValidators(this IServiceCollection services)
         {
+
+
+
+
+
             services.AddTransient<IValidator<LinGroupAddResource>, LinGroupAddResourceValidator>();
             services.AddTransient<IValidator<LinGroupUpdateResource>, LinGroupUpdateResourceValidator>();
             services.AddTransient<IValidator<LinUserAddResource>, LinUserAddResourceValidator>();

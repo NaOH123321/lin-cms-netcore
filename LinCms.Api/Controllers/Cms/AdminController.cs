@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using LinCms.Api.Exceptions;
 using LinCms.Api.Helpers;
+using LinCms.Api.Services;
 using LinCms.Core;
 using LinCms.Core.Entities;
 using LinCms.Core.EntityQueryParameters;
+using LinCms.Core.Enums;
 using LinCms.Core.Interfaces;
 using LinCms.Core.RepositoryInterfaces;
 using LinCms.Infrastructure.Messages;
@@ -86,7 +88,7 @@ namespace LinCms.Api.Controllers.Cms
                 {
                     throw new BadRequestException
                     {
-                        ErrorCode = ResultCode.UserEmailExsitedErrorCode
+                        ErrorCode = ResultCode.UserEmailExistedErrorCode
                     };
                 }
             }
@@ -105,6 +107,32 @@ namespace LinCms.Api.Controllers.Cms
             return Ok(resource);
         }
 
+        [HttpPut("password/{uid}")]
+        [PermissionMeta("修改用户密码", "管理员", mount: false)]
+        public async Task<ActionResult<OkMsg>> ChangeUserPassword(int uid, ResetPasswordByAdminResource resetPasswordByAdminResource)
+        {
+            var user = await _adminRepository.GetUserAsync(uid);
+
+            if (user == null)
+            {
+                throw new NotFoundException
+                {
+                    ErrorCode = ResultCode.UserNotFoundErrorCode
+                };
+            }
+
+            _adminRepository.ResetPassword(user, resetPasswordByAdminResource.Password);
+
+            if (!await UnitOfWork.SaveAsync())
+            {
+                throw new Exception("Save Failed!");
+            }
+
+            return Ok(new OkMsg
+            {
+                Msg = "密码修改成功"
+            });
+        }
 
         [HttpDelete("{uid}")]
         [Log("管理员删除了一个用户")]

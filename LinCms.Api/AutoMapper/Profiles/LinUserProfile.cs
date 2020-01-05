@@ -7,6 +7,7 @@ using AutoMapper;
 using LinCms.Api.Services;
 using LinCms.Core;
 using LinCms.Core.Entities;
+using LinCms.Core.Enums;
 using LinCms.Core.Interfaces;
 using LinCms.Infrastructure.Resources;
 using LinCms.Infrastructure.Resources.LinAuths;

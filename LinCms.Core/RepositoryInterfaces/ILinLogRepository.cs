@@ -10,5 +10,9 @@ namespace LinCms.Core.RepositoryInterfaces
     public interface ILinLogRepository
     {
         Task<PaginatedList<LinLog>> GetAllLogsAsync(LogParameters logParameters);
+
+        Task<PaginatedList<LinLog>> SearchAllLogsAsync(SearchLogParameters searchLogParameters);
+
+        Task<PaginatedList<string>> GetUsersByLogsAsync(QueryParameters parameters);
     }
 }

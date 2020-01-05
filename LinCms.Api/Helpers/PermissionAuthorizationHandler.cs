@@ -1,12 +1,9 @@
-﻿using System.Security.Claims;
-using System.Threading.Tasks;
-using LinCms.Api.Helpers;
+﻿using System.Threading.Tasks;
 using LinCms.Core;
 using LinCms.Core.Interfaces;
-using LinCms.Core.RepositoryInterfaces;
 using Microsoft.AspNetCore.Authorization;
 
-namespace LinCms.Api.Services
+namespace LinCms.Api.Helpers
 {
     public class PermissionAuthorizationHandler : AuthorizationHandler<PermissionMetaRequirement>
     {

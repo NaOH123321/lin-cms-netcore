@@ -56,7 +56,7 @@ namespace LinCms.Core
         UserPasswordErrorCode = 20010,
 
         [Display(Name = "邮箱已被注册，请重新输入邮箱")]
-        UserEmailExsitedErrorCode = 20020,
+        UserEmailExistedErrorCode = 20020,
 
         [Display(Name = "您目前处于未激活状态，请联系超级管理员")]
         UserInactiveErrorCode = 21000,

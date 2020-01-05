@@ -14,6 +14,7 @@ namespace LinCms.Core.RepositoryInterfaces
 
         void Add(LinUser user);
 
+        void ChangePassword(LinUser user, string password);
         void Update(LinUser user);
 
         void Delete(LinUser user);

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using LinCms.Core;
 using LinCms.Core.Entities;
+using LinCms.Core.Enums;
 using LinCms.Infrastructure.Helpers;
 using Microsoft.Extensions.Logging;
 

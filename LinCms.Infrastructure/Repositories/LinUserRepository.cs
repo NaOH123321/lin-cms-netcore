@@ -49,6 +49,12 @@ namespace LinCms.Infrastructure.Repositories
             _linContext.Add(user);
         }
 
+        public void ChangePassword(LinUser user, string password)
+        {
+            user.Password = Pbkdf2Encrypt.EncryptPassword(password);
+            _linContext.Update(user);
+        }
+
         public void Update(LinUser user)
         {
             _linContext.Update(user);

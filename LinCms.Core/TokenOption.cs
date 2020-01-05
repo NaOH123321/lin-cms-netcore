@@ -11,12 +11,5 @@ namespace LinCms.Core
 
         public static string AccessType = "access";
         public static string RefreshType = "refresh";
-
-
-        //private SecurityKey ServerSecret { get; }
-
-        //private SecurityKey issuer { get; }
-
-        //private SecurityKey audience { get; }
     }
 }

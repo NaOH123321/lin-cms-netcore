@@ -111,7 +111,7 @@ namespace LinCms.Api
 
         public void ConfigureContainer(ContainerBuilder builder)
         {
-            builder.RegisterModule<DefaultModule>();
+            builder.RegisterModule<BatchRegisterServiceModule>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

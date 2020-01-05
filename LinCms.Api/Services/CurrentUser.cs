@@ -6,6 +6,7 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using LinCms.Core;
 using LinCms.Core.Entities;
+using LinCms.Core.Enums;
 using LinCms.Core.Interfaces;
 using LinCms.Infrastructure.Database;
 using Microsoft.AspNetCore.Http;

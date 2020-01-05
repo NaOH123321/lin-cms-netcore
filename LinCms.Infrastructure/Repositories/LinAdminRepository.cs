@@ -123,6 +123,12 @@ namespace LinCms.Infrastructure.Repositories
             _linContext.AddRange(auths);
         }
 
+        public void ResetPassword(LinUser user, string password)
+        {
+            user.Password = Pbkdf2Encrypt.EncryptPassword(password);
+            _linContext.Update(user);
+        }
+
         public void Update(LinUser user)
         {
             _linContext.Update(user);

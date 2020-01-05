@@ -9,8 +9,10 @@ using LinCms.Api.Helpers;
 using LinCms.Api.Services;
 using LinCms.Core;
 using LinCms.Core.Entities;
+using LinCms.Core.Enums;
 using LinCms.Core.Interfaces;
 using LinCms.Core.RepositoryInterfaces;
+using LinCms.Infrastructure.Helpers;
 using LinCms.Infrastructure.Messages;
 using LinCms.Infrastructure.Resources.LinUsers;
 using Microsoft.AspNetCore.Authorization;
@@ -156,15 +158,33 @@ namespace LinCms.Api.Controllers.Cms
             return Ok(resource);
         }
 
-        //notCompleted
         [HttpPut("change_password")]
         [Log("{user.username}修改了自己的密码")]
         [PermissionMeta("修改密码", "用户", UserRole.Every, false)]
-        public ActionResult<LinUserResource> ChangePassword()
+        public async Task<ActionResult<OkMsg>> ChangePassword(ResetPasswordByUserResource resetPasswordByUserResource)
         {
-            var resource = MyMapper.Map<LinUserResource>(CurrentUser);
+            var user = await _linUserRepository.GetDetailAsync(CurrentUser.Id);
 
-            return Ok(resource);
+            var encryptPassword = Pbkdf2Encrypt.EncryptPassword(resetPasswordByUserResource.OldPassword);
+            if (user!.Password != encryptPassword)
+            {
+                throw new ForbiddenException
+                {
+                    ErrorCode = ResultCode.UserPasswordErrorCode
+                };
+            }
+
+            _linUserRepository.ChangePassword(user!, resetPasswordByUserResource.Password);
+
+            if (!await UnitOfWork.SaveAsync())
+            {
+                throw new Exception("Save Failed!");
+            }
+
+            return Ok(new OkMsg
+            {
+                Msg = "密码修改成功"
+            });
         }
 
         [HttpPut("avatar")]

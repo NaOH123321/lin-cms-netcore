@@ -22,6 +22,7 @@ namespace LinCms.Core.RepositoryInterfaces
         void Add(LinGroup group);
         void AddRange(IEnumerable<LinAuth> auths);
 
+        void ResetPassword(LinUser user, string password);
         void Update(LinUser user);
         void Update(LinGroup group);
 
