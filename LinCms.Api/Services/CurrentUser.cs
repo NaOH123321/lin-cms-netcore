@@ -77,19 +77,11 @@ namespace LinCms.Api.Services
             GroupId = group.Id;
             GroupName = group.Name;
             Auths = group.LinAuths.ToList();
-
-            //foreach (var linAuth in group.LinAuths)
-            //{
-            //    if (linAuth.Auth != null)
-            //    {
-            //        Auths.Add(linAuth);
-            //    }
-            //}
         }
 
         public bool CheckPermission(string? authName)
         {
-            return authName != null && Auths.Select(a => a.Auth).Contains(authName);
+            return !string.IsNullOrWhiteSpace(authName) && Auths.Select(a => a.Auth).Contains(authName);
         }
 
         public bool CheckRole(string roleName)

@@ -380,8 +380,8 @@ namespace LinCms.Api.Controllers.Cms
 
             foreach (var auth in linGroupDispatchAuthsResource.Auths)
             {
-               var exsitedLinAuth =  auths.SingleOrDefault(a => a.GroupId == linGroupDispatchAuthsResource.GroupId && a.Auth == auth);
-               if (exsitedLinAuth == null)
+               var existedLinAuth =  auths.SingleOrDefault(a => a.GroupId == linGroupDispatchAuthsResource.GroupId && a.Auth == auth);
+               if (existedLinAuth == null)
                {
                    var meta = dispatchedMetas.SingleOrDefault(m => m.Auth == auth);
                    if (meta != null)

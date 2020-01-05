@@ -135,25 +135,24 @@ namespace LinCms.Api
                 c.RoutePrefix = string.Empty;
             });
 
+            app.UseHttpsRedirection();
+
+            app.UseRouting();
+
             app.UseCors(builder =>
             {
-                string[] withOrigins = Configuration.GetSection("WithOrigins").Get<string[]>();
+                var withOrigins = Configuration.GetSection("WithOrigins").Get<string[]>();
                 builder.AllowAnyHeader();
                 builder.AllowAnyMethod();
                 builder.AllowCredentials();
                 builder.WithOrigins(withOrigins);
             });
 
-            app.UseHttpsRedirection();
-
-            app.UseRouting();
-
             app.UseSnakeCaseQuery();
 
             app.UseStatusCodeHandling();
 
             app.UseAuthentication();
-
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
