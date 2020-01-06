@@ -11,6 +11,6 @@ namespace LinCms.Core
         public string Role { get; set; } = null!;
         public bool Mount { get; set; }
         public string? MethodName { get; set; } 
-        public string? ControllerName { get; set; }
+        public string RouteName { get; set; } = null!;
     }
 }

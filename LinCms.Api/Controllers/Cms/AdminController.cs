@@ -15,6 +15,7 @@ using LinCms.Infrastructure.Messages;
 using LinCms.Infrastructure.Resources.LinGroups;
 using LinCms.Infrastructure.Resources.LinUsers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LinCms.Api.Controllers.Cms
@@ -22,7 +23,6 @@ namespace LinCms.Api.Controllers.Cms
     /// <summary>
     /// 管理员接口
     /// </summary>
-    [Produces("application/json")]
     [PermissionMeta(UserRole.Admin)]
     [Route("cms/admin")]
     public class AdminController : BasicController
@@ -41,10 +41,10 @@ namespace LinCms.Api.Controllers.Cms
         /// <response code="200">返回可分配的权限的列表</response>
         [HttpGet("authority")]
         [PermissionMeta("查询所有可分配的权限", "管理员", mount:false)]
-        public ActionResult<IEnumerable<PermissionMeta>> GetAllAuthorities()
+        public ActionResult<Dictionary<string, Dictionary<string, IEnumerable<string>>>> GetAllAuthorities()
         {
             var dispatchedMetas = PermissionMetaHandler.GetAllDispatchedMetas();
-            var resource = MyMapper.Map<IEnumerable<PermissionMeta>, IEnumerable<PermissionMeta>>(dispatchedMetas);
+            var resource = MyMapper.Map<IEnumerable<PermissionMeta>, Dictionary<string, Dictionary<string, IEnumerable<string>>>>(dispatchedMetas);
             return Ok(resource);
         }
 
@@ -257,7 +257,7 @@ namespace LinCms.Api.Controllers.Cms
             return Ok(resources);
         }
 
-        [HttpGet("group/{gid}")]
+        [HttpGet("group/{gid}", Name = "GetGroup")]
         [PermissionMeta("查询一个权限组及其权限", "管理员", mount: false)]
         public async Task<ActionResult<LinGroupWithAuthsResource>> GetGroup(int gid)
         {
@@ -276,6 +276,13 @@ namespace LinCms.Api.Controllers.Cms
             return Ok(resource);
         }
 
+        /// <summary>
+        /// 新建权限组
+        /// </summary>
+        /// <param name="linGroupAddResource"></param>
+        /// <returns></returns>
+        /// <response code="201">返回新建带权限的权限组</response>
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [HttpPost("group")]
         [Log("管理员新建了一个权限组")]
         [PermissionMeta("新建权限组", "管理员", mount: false)]
@@ -300,7 +307,7 @@ namespace LinCms.Api.Controllers.Cms
 
             var resource = MyMapper.Map<LinGroup, LinGroupWithAuthsResource>(group);
 
-            return Ok(resource);
+            return CreatedAtRoute("GetGroup", new { id = resource.Id }, resource);
         }
 
         [HttpPut("group/{gid}")]
@@ -380,14 +387,14 @@ namespace LinCms.Api.Controllers.Cms
 
             foreach (var auth in linGroupDispatchAuthsResource.Auths)
             {
-               var existedLinAuth =  auths.SingleOrDefault(a => a.GroupId == linGroupDispatchAuthsResource.GroupId && a.Auth == auth);
+               var existedLinAuth =  auths.FirstOrDefault(a => a.GroupId == linGroupDispatchAuthsResource.GroupId && a.Auth == auth);
                if (existedLinAuth == null)
                {
-                   var meta = dispatchedMetas.SingleOrDefault(m => m.Auth == auth);
-                   if (meta != null)
+                   var meta = dispatchedMetas.Where(m => m.Auth == auth).ToList();
+                   if (meta.Any())
                    {
-                       var linAuth = MyMapper.Map<PermissionMeta, LinAuth>(meta);
-                       linAuths.Add(linAuth);
+                       var addLinAuths = MyMapper.Map<IEnumerable<PermissionMeta>, IEnumerable<LinAuth>>(meta);
+                       linAuths.AddRange(addLinAuths);
                    }
                }
             }

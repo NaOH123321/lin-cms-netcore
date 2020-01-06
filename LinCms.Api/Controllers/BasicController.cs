@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
+using System.Net.Mime;
 using AutoMapper;
-using LinCms.Api.Exceptions;
 using LinCms.Core;
-using LinCms.Core.Entities;
 using LinCms.Core.Interfaces;
-using LinCms.Infrastructure.Messages;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LinCms.Api.Controllers
 {
+    [Consumes(MediaTypeNames.Application.Json)]
+    [Produces(MediaTypeNames.Application.Json)]
     [ApiController]
     public class BasicController : ControllerBase
     {

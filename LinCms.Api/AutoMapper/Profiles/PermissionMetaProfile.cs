@@ -13,6 +13,9 @@ namespace LinCms.Api.AutoMapper.Profiles
         public PermissionMetaProfile()
         {
             CreateMap<PermissionMeta, LinAuth>();
+
+            CreateMap<IEnumerable<PermissionMeta>, Dictionary<string, Dictionary<string, IEnumerable<string>>>>()
+                .ConvertUsing<PermissionMetasDisplayConvert>();
         }
     }
 }

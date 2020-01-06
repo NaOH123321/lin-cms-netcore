@@ -21,7 +21,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LinCms.Api.Controllers.Cms
 {
-    [Produces("application/json")]
     [Authorize]
     [Route("cms/user")]
     public class UserController : BasicController
@@ -53,6 +52,7 @@ namespace LinCms.Api.Controllers.Cms
         /// </remarks>
         /// <param name="linUserAddResource"></param>
         /// <returns></returns>
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [HttpPost("register")]
         [Log("管理员新建了一个用户")]
         [PermissionMeta("注册", "用户", UserRole.Admin, false)]

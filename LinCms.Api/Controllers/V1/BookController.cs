@@ -12,6 +12,7 @@ using LinCms.Infrastructure.Messages;
 using LinCms.Infrastructure.Resources;
 using LinCms.Infrastructure.Resources.Books;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LinCms.Api.Controllers.V1
@@ -50,6 +51,7 @@ namespace LinCms.Api.Controllers.V1
             return Ok(resource);
         }
 
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [HttpPost(Name = "AddBook")]
         public async Task<ActionResult<BookResource>> Post(BookAddResource bookAddResource)
         {

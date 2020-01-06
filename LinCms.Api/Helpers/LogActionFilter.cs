@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace LinCms.Api.Helpers
 {
-    public class LogActionFilter : IActionFilter, IOrderedFilter
+    public class LogActionFilter : IResultFilter, IOrderedFilter
     {
         public int Order { get; set; } = int.MaxValue - 10;
 
@@ -20,12 +20,12 @@ namespace LinCms.Api.Helpers
             _linLogger = linLogger;
         }
 
-        public void OnActionExecuting(ActionExecutingContext context)
+        public void OnResultExecuting(ResultExecutingContext context)
         {
 
         }
 
-        public void OnActionExecuted(ActionExecutedContext context)
+        public void OnResultExecuted(ResultExecutedContext context)
         {
             if (context.Exception != null) return;
 
@@ -35,7 +35,7 @@ namespace LinCms.Api.Helpers
 
             var permissionMetaAttribute = auditAction?.GetCustomAttribute<PermissionMetaAttribute>();
 
-            var currentUser = (ICurrentUser)context.HttpContext.RequestServices.GetService(typeof(ICurrentUser));
+            var currentUser = (ICurrentUser) context.HttpContext.RequestServices.GetService(typeof(ICurrentUser));
             _linLogger.AddLog(currentUser.Id, currentUser.Username, logAttribute.Template, permissionMetaAttribute?.Auth);
         }
     }

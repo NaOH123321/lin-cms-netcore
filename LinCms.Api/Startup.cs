@@ -126,6 +126,10 @@ namespace LinCms.Api
                 app.UseHsts();
             }
 
+            app.UseStatusCodeHandling();
+
+            app.UseHttpsRedirection();
+
             app.UseStaticFiles();
 
             app.UseSwagger();
@@ -134,8 +138,6 @@ namespace LinCms.Api
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "LinCms V1");
                 c.RoutePrefix = string.Empty;
             });
-
-            app.UseHttpsRedirection();
 
             app.UseRouting();
 
@@ -149,8 +151,6 @@ namespace LinCms.Api
             });
 
             app.UseSnakeCaseQuery();
-
-            app.UseStatusCodeHandling();
 
             app.UseAuthentication();
             app.UseAuthorization();
