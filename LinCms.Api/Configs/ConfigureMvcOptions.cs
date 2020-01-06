@@ -22,7 +22,7 @@ namespace LinCms.Api.Configs
 
         public void Configure(string name, MvcOptions options)
         {
-            //options.ReturnHttpNotAcceptable = true; //开启accept验证
+            options.ReturnHttpNotAcceptable = true; //开启accept验证
             options.Filters.Add(new HttpResponseExceptionFilter());
             options.Filters.Add(new LogActionFilter(_linLogger));
 

@@ -28,6 +28,7 @@ namespace LinCms.Api.Helpers
         public void OnResultExecuted(ResultExecutedContext context)
         {
             if (context.Exception != null) return;
+            if (context.HttpContext.Response.StatusCode >= 300) return;
 
             var auditAction = (context.ActionDescriptor as ControllerActionDescriptor)?.MethodInfo;
             var logAttribute = auditAction?.GetCustomAttribute<LogAttribute>();
