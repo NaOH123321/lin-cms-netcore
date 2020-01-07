@@ -4,15 +4,18 @@ using System.Net.Mime;
 using AutoMapper;
 using LinCms.Core;
 using LinCms.Core.Interfaces;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LinCms.Api.Controllers
 {
-    [Consumes(MediaTypeNames.Application.Json)]
+    //[Consumes(MediaTypeNames.Application.Json)]
     [Produces(MediaTypeNames.Application.Json)]
     [ApiController]
     public class BasicController : ControllerBase
     {
+        public IWebHostEnvironment Environment { set; get; } = null!;
+
         public IMapper MyMapper { set; get; } = null!;
         public IUnitOfWork UnitOfWork { set; get; } = null!;
 

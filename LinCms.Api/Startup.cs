@@ -146,7 +146,8 @@ namespace LinCms.Api
                 var withOrigins = Configuration.GetSection("WithOrigins").Get<string[]>();
                 builder.AllowAnyHeader();
                 builder.AllowAnyMethod();
-                builder.AllowCredentials();
+                //builder.AllowAnyOrigin();
+                //builder.AllowCredentials();
                 builder.WithOrigins(withOrigins);
             });
 
