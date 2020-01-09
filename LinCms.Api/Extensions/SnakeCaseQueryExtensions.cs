@@ -20,7 +20,6 @@ namespace LinCms.Api.Extensions
     {
         private readonly RequestDelegate _next;
 
-        //Your constructor will have the dependencies needed for database access
         public SnakeCaseQueryMiddleware(RequestDelegate next)
         {
             _next = next;
@@ -38,12 +37,10 @@ namespace LinCms.Api.Extensions
                     var v = kv[1];
                     return $"{k}={v}";
                 }));
-                QueryString newQuery = new QueryString($"?{parms}");
+                var newQuery = new QueryString($"?{parms}");
                 context.Request.QueryString = newQuery;
             }
 
-            //Let the next middleware (MVC routing) handle the request
-            //In case the path was updated, the MVC routing will see the updated path
             await _next.Invoke(context);
         }
     }

@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using LinCms.Core.Entities;
 
 namespace LinCms.Core.RepositoryInterfaces
 {
     public interface ILinFileRepository
     {
-        void Add(LinFile linFile);
+        Task<LinFile?> GetFileByMd5(string md5);
 
-        void AddRange(List<LinFile> linFiles);
+        void Add(LinFile linFile);
     }
 }

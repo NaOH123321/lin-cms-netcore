@@ -14,8 +14,6 @@ namespace LinCms.Api.Controllers
     [ApiController]
     public class BasicController : ControllerBase
     {
-        public IWebHostEnvironment Environment { set; get; } = null!;
-
         public IMapper MyMapper { set; get; } = null!;
         public IUnitOfWork UnitOfWork { set; get; } = null!;
 

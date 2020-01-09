@@ -16,7 +16,7 @@ namespace LinCms.Infrastructure.Helpers
         /// 这样做的目的是为了避开多线程问题。
         /// </summary>
         [ThreadStatic]
-        private static THashAlgorithm _instance;
+        private static THashAlgorithm? _instance;
 
         public static THashAlgorithm Instance => _instance ?? Create(); // C# 语法糖，低版本可以改为 { get { return instance != null ? instance : Create(); } }
 
@@ -37,7 +37,7 @@ namespace LinCms.Infrastructure.Helpers
 
             if (createMethod != null)
             {
-                _instance = (THashAlgorithm)createMethod.Invoke(null, new object[] { })!;
+                _instance = (THashAlgorithm) createMethod.Invoke(null, new object[] { })!;
             }
             else
             {

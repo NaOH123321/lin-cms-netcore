@@ -72,5 +72,15 @@ namespace LinCms.Core
 
         [Display(Name = "权限分组下存在用户，不可删除")]
         GroupHasUserErrorCode = 22010,
+
+        //文件错误类
+        [Display(Name = "上传文件超过最大数量")]
+        FileTooManyErrorCode = 30000,
+
+        [Display(Name = "上传文件超过最大尺寸")]
+        FileTooLargeErrorCode = 30010,
+
+        [Display(Name = "上传文件的类型不允许")]
+        FileExtensionErrorCode = 30020,
     }
 }

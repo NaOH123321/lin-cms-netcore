@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using LinCms.Core.Entities;
 using LinCms.Core.Interfaces;
 using LinCms.Core.RepositoryInterfaces;
 using LinCms.Infrastructure.Database;
+using Microsoft.EntityFrameworkCore;
 
 namespace LinCms.Infrastructure.Repositories
 {
@@ -17,18 +20,20 @@ namespace LinCms.Infrastructure.Repositories
             _linContext = linContext;
         }
 
-        public void Upload()
+        public async Task<LinFile?> GetFileByMd5(string md5)
         {
+            var query = _linContext.LinFiles
+                .AsQueryable();
 
+            query = query.Where(f => f.Md5 == md5);
+
+            var linFile = await query.SingleOrDefaultAsync();
+            return linFile;
         }
 
         public void Add(LinFile linFile)
         {
             _linContext.Add(linFile);
-        }
-        public void AddRange(List<LinFile> linFiles)
-        {
-            _linContext.AddRange(linFiles);
         }
     }
 }

@@ -1,144 +1,82 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using LinCms.Api.Exceptions;
 using LinCms.Api.Helpers;
 using LinCms.Api.Services;
-using LinCms.Core;
 using LinCms.Core.Entities;
+using LinCms.Core.Interfaces;
 using LinCms.Core.RepositoryInterfaces;
-using LinCms.Infrastructure.Repositories;
-using LinCms.Infrastructure.Resources.LinUsers;
+using LinCms.Infrastructure.Resources.LinFiles;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Models;
 
 namespace LinCms.Api.Controllers.Cms
 {
-    //[Authorize]
+    [Authorize]
     [Route("cms/file")]
     public class FileController : BasicController
     {
-        private readonly FileService _fileService;
+        private readonly IFileService _fileService;
         private readonly ILinFileRepository _linFileRepository;
 
-        public FileController(FileService fileService, ILinFileRepository linFileRepository)
+        public FileController(IFileService fileService, ILinFileRepository linFileRepository)
         {
             _fileService = fileService;
             _linFileRepository = linFileRepository;
         }
 
         [HttpPost]
-        public async Task<ActionResult<IEnumerable<FileResource>>> UploadFile([FromForm] IFormFileCollection formFileCollection)
+        public async Task<ActionResult<IEnumerable<LinFileResource>>> UploadFile([FromForm] IFormFileCollection files)
         {
+            _fileService.Verify(files);
 
-            if (formFileCollection.Count == 0)
+            var fileResults = new List<LinFileResource>();
+
+            foreach (var file in files)
             {
-                throw new BadRequestException
-                {
-                    Msg = "文件不能为空"
-                };
-            }
+                var resource = await HandleFile(file);
 
-            var fileResults = new List<FileResource>();
-
-            foreach (var file in formFileCollection)
-            {
-                var storePath = GetStorePath(file);
-
-                var linFile = new LinFile
-                {
-                    Name = storePath.realName,
-                    Path = storePath.relativePath,
-                    Extension = GetFileExtension(file),
-                    Size = GetFileSize(file),
-                    Md5 = GenerateMd5(file)
-                };
-
-                SaveFile(file, storePath.absolutePath);
-
-
-
-                _linFileRepository.Add(linFile);
-
-                var fileResult = new FileResource
-                {
-                    Key = file.Name,
-                    Id = linFile.Id,
-                    Path = linFile.Path,
-                    Url = Path.Combine(_fileService.StoreDir, linFile.Path)
-                };
-                fileResults.Add(fileResult);
-            }
-
-
-            if (!await UnitOfWork.SaveAsync())
-            {
-                throw new Exception("Save Failed!");
+                fileResults.Add(resource);
             }
 
             return Ok(fileResults);
         }
 
-
-        public (string realName, string relativePath, string absolutePath) GetStorePath(IFormFile file)
+        private async Task<LinFileResource> HandleFile(IFormFile file)
         {
-            var formDate = DateTime.Now.ToString("yyyyMMdd");
-            var saveDir = _fileService.StoreDir + $"{formDate}";
-            if (!Directory.Exists(saveDir))
+            var md5 = FileHelper.GenerateMd5(file);
+            var linFile = await _linFileRepository.GetFileByMd5(md5);
+
+            if (linFile == null)
             {
-                Directory.CreateDirectory(saveDir);
+                var (realName, relativePath, absolutePath) = _fileService.GetStorePath(file);
+
+                linFile = new LinFile
+                {
+                    Name = realName,
+                    Path = relativePath,
+                    Extension = FileHelper.GetFileExtension(file),
+                    Size = FileHelper.GetFileSize(file),
+                    Md5 = md5
+                };
+
+                _fileService.SaveFile(file, absolutePath);
+                _linFileRepository.Add(linFile);
+                await UnitOfWork.SaveAsync();
             }
 
-            var realName = GetRealName(file);
-            var relativePath = $@"{formDate}\{realName}";
-            var absolutePath = Path.Combine(_fileService.StoreDir, relativePath);
-
-            return (realName, relativePath, absolutePath);
+            var resource = new LinFileResource
+            {
+                Key = file.Name,
+                Id = linFile.Id,
+                Path = linFile.Path,
+                Url = Path.Combine(_fileService.StoreDir, linFile.Path)
+            };
+            return resource;
         }
-
-        public static string GetRealName(IFormFile file)
-        {
-            var realName = Guid.NewGuid() + GetFileExtension(file);
-            return realName;
-        }
-
-        public static void SaveFile(IFormFile file, string absolutePath)
-        {
-            using var fileStream = new FileStream(absolutePath, FileMode.Create);
-            file.CopyTo(fileStream);
-            fileStream.Flush();
-        }
-
-        public static string GetFileExtension(IFormFile file)
-        {
-            return Path.GetExtension(file.FileName);
-        }
-
-        public static int GetFileSize(IFormFile file)
-        {
-            return (int)file.Length;
-        }
-
-        public static string GenerateMd5(IFormFile file)
-        {
-            using var fileStream = file.OpenReadStream();
-            var bt = new byte[fileStream.Length];
-            fileStream.Read(bt, 0, bt.Length);
-            var fileString = Convert.ToBase64String(bt);
-
-            return HashAlgorithmHelper.ComputeHash<MD5>(fileString);
-        }
-    }
-
-    public class FileResource
-    {
-        public string Key { get; set; } = null!;
-        public int Id { get; set; }
-        public string Path { get; set; } = null!;
-        public string Url { get; set; } = null!;
     }
 }

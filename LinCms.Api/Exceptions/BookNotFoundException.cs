@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LinCms.Core;
-using LinCms.Infrastructure.Messages;
 using Microsoft.AspNetCore.Http;
 
 namespace LinCms.Api.Exceptions

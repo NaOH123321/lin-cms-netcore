@@ -10,11 +10,13 @@ using LinCms.Api.Configs;
 using LinCms.Api.Extensions;
 using LinCms.Api.Helpers;
 using LinCms.Api.Services;
+using LinCms.Core.Entities;
 using LinCms.Core.Interfaces;
 using LinCms.Infrastructure.Database;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.EntityFrameworkCore;
@@ -93,7 +95,7 @@ namespace LinCms.Api
 
             services.AddScoped<ICurrentUser, CurrentUser>();
             services.AddScoped<ILinLogger, LinLogger>();
-
+            services.AddScoped<IFileService, FileService>();
 
             //设置Swagger
             services.AddMySwaggerGen();
@@ -103,8 +105,6 @@ namespace LinCms.Api
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             //校验资源
             services.AddFluentValidators();
-            ////注册映射关系
-            //services.AddPropertyMappings();
             //注册数据仓库
             services.AddRepositories();
         }

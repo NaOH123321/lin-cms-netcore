@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
-using LinCms.Api.Configs;
-using LinCms.Api.Services;
-using LinCms.Core.Interfaces;
+using LinCms.Api.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 
 namespace LinCms.Api.Extensions
@@ -24,7 +19,7 @@ namespace LinCms.Api.Extensions
                 {
                     Version = "v1",
                     Title = "LinCms API",
-                    Description = "A simple and practical CMS implememted by ASP.NET Core",
+                    Description = "A simple and practical CMS implemented by ASP.NET Core",
                     //TermsOfService = new Uri("https://example.com/terms"),
                     Contact = new OpenApiContact
                     {
@@ -38,22 +33,10 @@ namespace LinCms.Api.Extensions
                         Url = new Uri("http://localhost:5000")
                     }
                 });
-                var security = new OpenApiSecurityRequirement
-                {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Id = "Bearer",
-                                Type = ReferenceType.SecurityScheme
-                            }
-                        },
-                        Array.Empty<string>()
-                    }
-                };
-                options.AddSecurityRequirement(security);//添加一个必须的全局安全信息，和AddSecurityDefinition方法指定的方案名称要一致，这里是Bearer。
-                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+
+                //添加一个必须的全局安全过滤信息，和AddSecurityDefinition方法指定的方案名称要一致，这里是Bearer。
+                options.OperationFilter<SwaggerSecurityFilter>();
+                options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
                 {
                     Description = "JWT授权(数据将在请求头中进行传输) 参数结构: \"Authorization: Bearer {token}\"",
                     Name = "Authorization",//jwt默认的参数名称
