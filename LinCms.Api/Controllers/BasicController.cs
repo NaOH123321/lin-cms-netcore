@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LinCms.Api.Controllers
 {
-    //[Consumes(MediaTypeNames.Application.Json)]
     [Produces(MediaTypeNames.Application.Json)]
     [ApiController]
     public class BasicController : ControllerBase

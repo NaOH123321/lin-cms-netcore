@@ -6,6 +6,7 @@ using LinCms.Api.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace LinCms.Api.Extensions
 {
@@ -58,6 +59,9 @@ namespace LinCms.Api.Extensions
                 //var basePath = Path.GetDirectoryName(typeof(Program).Assembly.Location);//获取应用程序所在目录（绝对，不受工作目录影响，建议采用此方法获取路径）
                 //var xmlPath = Path.Combine(basePath, "SwaggerDemo.xml");
                 //c.IncludeXmlComments(xmlPath);
+
+                options.AddFluentValidationRules();
+                options.EnableAnnotations();
             });
         }
     }
