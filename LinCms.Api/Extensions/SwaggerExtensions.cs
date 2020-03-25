@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using LinCms.Api.Helpers;
+using LinCms.Infrastructure.Resources.Books;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
@@ -62,6 +63,9 @@ namespace LinCms.Api.Extensions
 
                 options.AddFluentValidationRules();
                 options.EnableAnnotations();
+
+                options.ParameterFilter<SwaggerSnakeCaseParameterFilter>();
+                options.DocumentFilter<SwaggerSnakeCaseDocumentFilter>();
             });
         }
     }

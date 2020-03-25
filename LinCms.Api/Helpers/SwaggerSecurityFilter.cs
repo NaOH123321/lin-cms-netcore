@@ -15,29 +15,25 @@ namespace LinCms.Api.Helpers
     {
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
-            //allowAnonymousAttribute
-            var allowAnonymousAttribute =
+            //controller的AllowAnonymousAttribute
+            var allowAnonymous1 =
+                context.MethodInfo.DeclaringType?.GetCustomAttribute(typeof(AllowAnonymousAttribute)) as AllowAnonymousAttribute;
+
+            //method的AllowAnonymousAttribute
+            var allowAnonymous2 =
                 context.MethodInfo.GetCustomAttribute(typeof(AllowAnonymousAttribute)) as AllowAnonymousAttribute;
 
-            //controller的AuthorizeAttribute
-            var controllerRequiredScopes = context.MethodInfo.ReflectedType
-                ?.GetCustomAttributes(true)
+            var allowAnonymousAttributeNotExist = allowAnonymous1 == null && allowAnonymous2 == null;
+
+
+            //controller的AuthorizeAttribute和method的AuthorizeAttribute
+            var requiredScopes = context.MethodInfo.DeclaringType?.GetCustomAttributes(true)
+                .Union(context.MethodInfo.GetCustomAttributes(true))
                 .OfType<AuthorizeAttribute>()
                 .Select(attr => attr.Policy)
                 .Distinct().ToList();
 
-            //method的AuthorizeAttribute
-            var methodRequiredScopes = context.MethodInfo
-                .GetCustomAttributes(true)
-                .OfType<AuthorizeAttribute>()
-                .Select(attr => attr.Policy)
-                .Distinct().ToList();
-
-            var requiredScopes = controllerRequiredScopes == null
-                ? methodRequiredScopes
-                : methodRequiredScopes.Union(controllerRequiredScopes).ToList();
-
-            if (requiredScopes.Any() && allowAnonymousAttribute == null)
+            if (requiredScopes != null && requiredScopes.Any() && allowAnonymousAttributeNotExist)
             {
                 operation.Responses.Add(StatusCodes.Status401Unauthorized.ToString(),
                     new OpenApiResponse {Description = "未授权"});

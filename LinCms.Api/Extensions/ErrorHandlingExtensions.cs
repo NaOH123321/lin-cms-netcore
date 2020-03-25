@@ -15,19 +15,23 @@ namespace LinCms.Api.Extensions
         {
             return app.UseStatusCodePages(context =>
             {
-                var statusCode = context.HttpContext.Response.StatusCode;
-                context.HttpContext.Response.ContentType = MediaTypeNames.Application.Json;
+                var response = context.HttpContext.Response;
+                var statusCode = response.StatusCode;
+                response.ContentType = MediaTypeNames.Application.Json;
 
                 return statusCode switch
-                {
-                    StatusCodes.Status401Unauthorized => context.HttpContext.Response.WriteAsync(new UnauthorizedMsg().ToJson()),
-                    StatusCodes.Status403Forbidden => context.HttpContext.Response.WriteAsync(new ForbiddenMsg().ToJson()),
-                    StatusCodes.Status404NotFound => context.HttpContext.Response.WriteAsync(new NotFoundMsg().ToJson()),
-                    StatusCodes.Status405MethodNotAllowed => context.HttpContext.Response.WriteAsync(new MethodNotAllowedMsg().ToJson()),
-                    StatusCodes.Status406NotAcceptable => context.HttpContext.Response.WriteAsync(new NotAcceptableMsg().ToJson()),
-                    StatusCodes.Status415UnsupportedMediaType => context.HttpContext.Response.WriteAsync(new UnsupportedMediaTypeMsg().ToJson()),
-                    _ => throw new Exception("Error, status code: " + context.HttpContext.Response.StatusCode),
-                };
+                    {
+                    StatusCodes.Status401Unauthorized => response.WriteAsync(new UnauthorizedMsg().ToJson()),
+                    StatusCodes.Status403Forbidden => response.WriteAsync(new ForbiddenMsg().ToJson()),
+                    StatusCodes.Status404NotFound => context.HttpContext.Request.Path.Value.Contains("wwwroot")
+                        ? response.WriteAsync(new StaticFileNotFoundMsg().ToJson())
+                        : response.WriteAsync(new NotFoundMsg().ToJson()),
+                    StatusCodes.Status405MethodNotAllowed => response.WriteAsync(new MethodNotAllowedMsg().ToJson()),
+                    StatusCodes.Status406NotAcceptable => response.WriteAsync(new NotAcceptableMsg().ToJson()),
+                    StatusCodes.Status415UnsupportedMediaType => response.WriteAsync(new UnsupportedMediaTypeMsg()
+                        .ToJson()),
+                    _ => throw new Exception("Error, status code: " + response.StatusCode),
+                    };
             });
         }
     }

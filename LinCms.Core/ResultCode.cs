@@ -38,6 +38,9 @@ namespace LinCms.Core
         [Display(Name = "不支持的Acceptable")]
         NotAcceptableErrorCode = 10050,
 
+        [Display(Name = "静态资源不存在")]
+        StaticFileNotFoundErrorCode = 10060,
+
 
         [Display(Name = "资源不存在")]
         ResourceNotFoundErrorCode = 11000,
